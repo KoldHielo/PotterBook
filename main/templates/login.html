@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>Login - PotterBook</title>
+<style>
+  
+  form {
+    display: grid;
+    position: relative;
+    width: 400px;
+    border: 3px solid white;
+    border-top: none;
+    margin: 100px auto 5px auto;
+  }
+
+  h1, .border-top {
+    position: absolute;
+  }
+
+  h1 {
+    color: white;
+    justify-self: center;
+    top: -20px;
+  }
+
+  .border-top {
+    width: 140px;
+    height: 2px;
+    background-color: white;
+  }
+
+  #border-top-right {
+    justify-self: right;
+  }
+
+  label, input {
+    text-align: center;
+  }
+
+  label {
+    margin-top: 10px;
+  }
+
+  label:first-of-type {
+    margin-top: 40px;
+  }
+
+  input {
+    margin: 0 auto 0 auto;
+    width: 90%;
+  }
+
+  input:last-of-type {
+    margin-bottom: 10px;
+  }
+
+  button {
+    margin: 15px auto;
+    width: 50px;
+  }
+
+  #fyp {
+    display: block;
+    margin: 0 auto 365px auto;
+    text-decoration: underline;
+    text-align: right;
+    width: 400px;
+    font-size: 13.5px;
+  }
+</style>
+{% endblock %}
+
+{% block main %}
+<form action="/login/" method="post">
+  {% csrf_token %}
+  <h1>Login</h1>
+  <div id="border-top-left" class="border-top"></div>
+  <div id="border-top-right" class="border-top"></div>
+  <label for="username">Username</label>
+  <input required type="text" id="username" name="username" />
+  <label for="password">Password</label>
+  <input required type="password" id="password" name="password" />
+  <button>Submit</button>
+</form>
+<a id="fyp" href="{% url 'forgot_password' %}">Forgotten your password?</a>
+{% endblock %}

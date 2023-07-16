@@ -1,0 +1,662 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>{{business_name}} Booking Page - PotterBook</title>
+<meta name="description" content="{{business_bio}}">
+
+<style>
+    :root {
+      --circle-diameter: 40px;
+      --cross-size: 20px;
+      --photo-hw: 150px;
+    }
+
+    #business-info > * {
+      display: block;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    #business-info > h1 {
+      text-decoration: underline;
+    }
+
+    #business-photo {
+      display: block;
+      height: var(--photo-hw);
+      width: var(--photo-hw);
+      object-fit: cover;
+      object-position: 50% 50%;
+      border-radius: 50%;
+      margin: 100px auto 20px auto;
+  }
+
+    #business-bio {
+      margin: 15px auto 0 auto;
+      padding: 0 50px;
+    }
+
+    #business-bio > p {
+      margin: 13px 0;
+    }
+
+    h2 {
+      margin: 100px 0 30px 0;
+      text-align: center;
+    }
+
+    h2 span {
+      margin: 0 4px;
+    }
+
+    #loading {
+      display: none;
+      position: absolute;
+      text-align: center;
+      left: 50%;
+      transform: translate(-50%, 0);
+      height: 400px;
+      display: grid;
+      align-items: center;
+    }
+
+    table, #loading {
+      width: 100%;
+      max-width: 400px;
+      margin: 0 auto;
+      user-select: none;
+    }
+
+    #business-schedule {
+      position: relative;
+    }
+
+    th {
+      font-size: 10px;
+    }
+
+    td {
+    margin: 10px 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    }
+
+    tr {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+    }
+
+    #buttons {
+      display: flex;
+      justify-content: space-evenly;
+      margin: 50px auto;
+      width: 300px;
+    }
+
+    #buttons > * {
+      width: 20px;
+      height: 20px;
+      border: 5px solid white;
+      background-color: transparent;
+      border-bottom: none;
+      border-right: none;
+    }
+
+    #previous-month {
+      transform: rotate(-45deg);
+      
+    }
+
+    #next-month {
+      transform: rotate(135deg);
+    }
+
+    #previous-month:hover, #next-month:hover {
+      cursor: pointer;
+      border: 5px solid green;
+      border-bottom: none;
+      border-right: none;
+    }
+
+    .date-row > td[style]:hover{
+      transform: scale(1.5);
+      cursor: pointer;
+    }
+
+    .date-row > td {
+      border-radius: 50%;
+      width: var(--circle-diameter);
+      height: var(--circle-diameter);
+    }
+
+    #show-apps-for-div, #timezone-div {
+      margin: 5px auto;
+      display: flex;
+      justify-content: center;
+    }
+
+    #appointment-container {
+      position: fixed;
+      color: black;
+      background-color: white;
+      width: 350px;
+      border: 2px solid navy;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      border-radius: 10%;
+      box-shadow: 2px 19px 31px rgba(0, 0, 0, 0.2);
+      transition: 1s;
+      opacity: 0;
+      z-index: -1;
+    }
+
+    #form-background {
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background-color: black;
+      opacity: 0;
+      transition: 1s;
+      z-index: -1;
+    }
+        
+    #cross {
+      height: var(--cross-size);
+      width: var(--cross-size);
+      position: absolute;
+      right: 25px;
+      top: 15px;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+    }
+        
+    .cross {
+        height: 2px;
+        width: 100%;
+        background-color: navy;
+        position: absolute;
+    }
+        
+    .cross.one {
+        transform: rotate(45deg);
+    }
+    
+    .cross.two {
+        transform: rotate(-45deg);
+    }
+    
+    #appointment-container > h2 {
+        margin: 50px auto 30px auto;
+        text-align: center;
+        color: navy;
+    }
+    
+    #appointments {
+        width: 80%;
+        max-height: 200px;
+        border: 1px solid black;
+        margin: 30px auto 0 auto;
+        overflow-y: scroll;
+        
+    }
+    
+    #appointments > div {
+        display: flex;
+        justify-content: space-evenly;
+        align-items: center;
+        padding: 10px 0;
+        
+    }
+    
+    #appointments > div:not(:last-of-type) {
+        border-bottom: 2px solid black;
+    }
+    
+    #appointments > div > label {
+        padding: 20px 0;
+    }
+    
+    #continue-button {
+        color: #fff;
+        width: 130px;
+        text-align: center;
+        margin: 40px auto 20px auto;
+        padding: 12.5px 35px 12.5px 25px;
+        border-radius: 100px;
+        background-color: #4C43CD;
+        background-image: radial-gradient(93% 87% at 87% 89%, rgba(0, 0, 0, 0.23) 0%, transparent 86.18%), radial-gradient(66% 87% at 26% 20%, rgba(255, 255, 255, 0.41) 0%, rgba(255, 255, 255, 0) 69.79%, rgba(255, 255, 255, 0) 100%);
+        box-shadow: 2px 19px 31px rgba(0, 0, 0, 0.2);
+        font-weight: bold;
+        font-size: 16px;
+  
+        user-select: none;
+        touch-action: manipulation;
+        cursor: pointer;
+    }
+  </style>
+  {% if stripe_enabled %}
+  <style>
+    @media only screen and (min-width: 1000px) {
+      #schedule-page {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      #business-photo {
+        margin: 50px auto 20px auto;
+      }
+    }
+  </style>
+  {% endif %}
+{% endblock %}
+
+{% block main %}
+  <section id="schedule-page">
+    <section id="business-info">
+      {% if business_photo %}
+      <img id="business-photo" src="{{business_photo}}" alt="{{business_name}} Image">
+      {% else %}
+      <img id="business-photo" src="https://calendar-app.team-oldfield.repl.co/media/calendar.jpg" alt="{{business_name}} Image">
+      {% endif %}
+      <h1>{{business_name}}</h1>
+      {% if business_bio %}
+      <div id="business-bio">{{business_bio|linebreaks}}</div>
+      {% endif %}
+    </section>
+    {% if stripe_enabled %}
+    <section id="business-schedule">
+      <h2><span id="month"></span><span id="year"></span></h2>
+      <div id="loading">
+        <div>Loading...</div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Sunday</th>
+            <th>Monday</th>
+            <th>Tuesday</th>
+            <th>Wednesday</th>
+            <th>Thursday</th>
+            <th>Friday</th>
+            <th>Saturday</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="date-row" id="date-row-1">
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr class="date-row" id="date-row-2">
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr class="date-row" id="date-row-3">
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr class="date-row" id="date-row-4">
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr class="date-row" id="date-row-5">
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr class="date-row" id="date-row-6">
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div id="show-apps-for-div">
+        <label for="show-apps-for">Show appointments for: </label>
+        <select id="show-apps-for" name="show-apps-for">
+          <option value="all_services">All Services</option>
+          {% for service in business_services %}
+          <option value="{{service.service}}">{{service.service}}</option>
+          {% endfor %}
+        </select>
+      </div>
+      
+      <div id="timezone-div">
+        <label for="timezone">Timezone: </label>
+        <select id="timezone" name="timezone">
+          <option value='UTC'>UTC</option>
+          <!--Filled with JS-->
+        </select>
+      </div>
+    
+      <div id="buttons">
+        <button type="button" id="previous-month"></button>
+        <button type="button" id="next-month"></button>
+      </div>
+    </section>
+  </section>
+          <div id="form-background"></div>
+          <form id="appointment-container" class="popup-form" method="post" action="{% url 'book_slot' business_slug %}">
+              <input type="hidden" name="readable-date">
+              {% csrf_token %}
+              <div id="cross">
+                  <div class="cross one"></div>
+                  <div class="cross two"></div>
+              </div>
+              <h2>Choose an appointment:</h2>
+              <section id="appointments">
+                <!--Filled with JS-->
+              </section>
+              <div id="continue-button">Continue</div>
+          </form>
+  <script>
+    let oneToArgFunc = daysOfMonth => Array.from({length: daysOfMonth}, (_, i) => i + 1);
+    let thirtyDays = oneToArgFunc(30);
+    let thirtyOneDays = oneToArgFunc(31);
+    let twentyFourHours = Array.from({length: 24}, (_,i) => i);
+    const appointmentContainer = document.querySelector('#appointment-container');
+    const formBackground = document.querySelector('#form-background');
+    const appointmentList = document.querySelector('#appointments');
+    const acCloseButton = document.querySelector('#cross');
+    const acContinueButton = document.querySelector('#continue-button');
+    const readableDate = document.querySelector('input[name="readable-date"]');
+
+    acContinueButton.addEventListener('click', () => {
+      const serviceOriginal = document.querySelector('#show-apps-for');
+      const service = document.querySelector('#show-apps-for').cloneNode(true);
+      const timezoneOriginal = document.querySelector('#timezone');
+      const timezone = document.querySelector('#timezone').cloneNode(true);
+      service.value = serviceOriginal.value;
+      timezone.value = timezoneOriginal.value;
+      service.style.display = 'none';
+      timezone.style.display = 'none';
+      appointmentContainer.appendChild(service);
+      appointmentContainer.appendChild(timezone);
+      appointmentContainer.submit();
+    })
+
+    acCloseButton.addEventListener('click', async () => {
+      appointmentContainer.style.opacity = 0;
+      formBackground.style.opacity = 0;
+      await new Promise((resolve, reject) => {
+        appointmentContainer.addEventListener('transitionend', () => resolve());
+      });
+      appointmentContainer.style.zIndex = -1;
+      formBackground.style.zIndex = -1;
+      appointmentList.innerHTML = '';
+    });
+
+    let monthsAndDates = [
+      ['January', thirtyOneDays],
+      ['February', [oneToArgFunc(28), oneToArgFunc(29)]],
+      ['March', thirtyOneDays],
+      ['April', thirtyDays],
+      ['May', thirtyOneDays],
+      ['June', thirtyDays],
+      ['July', thirtyOneDays],
+      ['August', thirtyOneDays],
+      ['September', thirtyDays],
+      ['October', thirtyOneDays],
+      ['November', thirtyDays],
+      ['December', thirtyOneDays]
+    ]
+
+    let today = new Date();
+    month = document.querySelector('#month');
+    year = document.querySelector('#year');
+
+    month.innerHTML = today.toLocaleDateString('en-GB', {month: 'long'});
+    year.innerHTML = today.getFullYear();
+
+
+    let dateCount = new Date(today.getFullYear(), today.getMonth(), 1).getDay();
+    let monthCount = today.getMonth();
+
+    let nextMonth = () => {
+      monthCount++;
+      if(monthCount > 11) {
+        monthCount = 0;
+        year.innerHTML++;
+      }
+      month.innerHTML = monthsAndDates[monthCount][0];
+      dateCount = new Date(year.innerHTML, monthCount, 1).getDay();
+      injectDates();
+    }
+
+    let prevMonth = () => {
+      monthCount--;
+      if(monthCount < 0) {
+        monthCount = 11;
+        year.innerHTML--;
+      }
+      month.innerHTML = monthsAndDates[monthCount][0];
+      dateCount = new Date(year.innerHTML, monthCount, 1).getDay();
+      injectDates();
+    }
+
+    let dates
+    let injectDates = () => {
+      if(month.innerHTML === 'February') {
+        if(year.innerHTML % 4 === 0) {
+          dates = monthsAndDates[monthCount][1][1];
+        }
+        else {
+          dates = monthsAndDates[monthCount][1][0];
+        }
+      }
+      else {
+        dates = monthsAndDates[monthCount][1];
+      }
+      let rowCount = 1;
+      clearDateRows(hardClear=true);
+
+      for(let i = 0; i < dates.length; i++) {
+        if(dateCount > 6) {
+          dateCount = 0;
+          rowCount++
+        }
+        let dateBox = document.querySelector(`#date-row-${rowCount}`).children[dateCount];
+        dateBox.innerHTML = dates[i];
+        dateBox.id = `date-${dates[i]}`;
+
+        if(today.getFullYear() === parseInt(year.innerHTML) && today.getMonth() === monthCount && today.getDate() === dates[i]) {
+
+          dateBox.style.border = '2px solid white'
+        }
+        dateCount++;
+      }
+      markAvailableAppointments(dates);
+    }
+
+    const dateRows = document.querySelectorAll('.date-row');
+
+    const clearDateRows = (hardClear=false) => {
+      for(let i = 0; i < dateRows.length; i++) {
+        for(let j = 0; j < dateRows[i].children.length; j++) {
+          if(hardClear == true) {
+          dateRows[i].children[j].innerHTML = '';
+          dateRows[i].children[j].removeAttribute('id');
+          }
+          dateRows[i].children[j].removeAttribute('style');
+          dateRows[i].children[j].onclick = '';
+        }
+      }
+    }
+    //Continue
+    const timezoneSelect = document.querySelector('#timezone');
+    const showAppsFor = document.querySelector('#show-apps-for');
+    const calendar = document.querySelector('table');
+    const loadingDiv = document.querySelector('#loading');
+
+    const localTz = Intl.DateTimeFormat().resolvedOptions().timeZone
+    Intl.supportedValuesOf('timeZone').forEach(tz => {
+      const optionTz = document.createElement('option');
+      optionTz.innerHTML = tz;
+      optionTz.value = tz;
+      timezoneSelect.appendChild(optionTz);
+      if(tz == localTz) {
+        optionTz.selected = true;
+      }
+    })
+    
+    let markAvailableAppointments = async monthsAndDates => {
+      prevMonthButton.removeEventListener('click', prevMonth);
+      nextMonthButton.removeEventListener('click', nextMonth);
+      calendar.style.opacity = '30%';
+      loadingDiv.style.display = 'grid';
+      const url = '{% url "retreive_dates" slug=business_slug %}';
+      const csrfToken = document.querySelector('[name="csrfmiddlewaretoken"]').value;
+      let dates = [];
+      monthsAndDates.forEach(day => {
+        let date = new Date(Date.UTC(
+          parseInt(year.innerHTML),
+          monthCount,
+          day
+        ));
+        date = date.toISOString();
+        dates.push(date);
+      });
+      let data = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': csrfToken,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          dates: dates,
+          service: showAppsFor.value,
+          timezone: timezoneSelect.value
+        })
+      });
+      data = await data.json();
+      if(data.dates === null) {
+        prevMonthButton.addEventListener('click', prevMonth);
+        nextMonthButton.addEventListener('click', nextMonth);
+        calendar.style.opacity = 1;
+        loadingDiv.style.display = 'none';
+        return;
+      }
+      data.dates.forEach(date => {
+        let fully_booked = false;
+        for(let i = 0, booked = 0; i < date[1].length; i++) {
+          if(date[1][i][1] === true) {
+            booked++;
+          }
+          if(booked === date[1].length) {
+            fully_booked = true;
+          }
+        }
+        if(fully_booked === true) {
+          prevMonthButton.addEventListener('click', prevMonth);
+          nextMonthButton.addEventListener('click', nextMonth);
+          calendar.style.opacity = 1
+          loadingDiv.style.display = 'none';
+          return;
+        }
+        const dateObj = new Date(date[0]);
+        const dateBox = document.querySelector(`#date-${dateObj.getDate()}`);
+        dateBox.style.backgroundColor = 'lightgreen';
+        dateBox.onclick = () => {
+          //Write logic to make list of times here
+          appointmentContainer.style.zIndex = '1';
+          appointmentContainer.style.opacity = '1';
+          formBackground.style.zIndex = '1';
+          formBackground.style.opacity = '20%';
+          let dateObj = {};
+          for(let i = 0; i < date[1].length; i++) {
+            const is_booked = date[1][i][1];
+            if(is_booked === true) {
+              continue;
+            }
+            const isoAppointment = date[1][i][0];
+            let appointment = new Date(isoAppointment);
+            const options = {
+              weekday: 'short',
+              day: 'numeric',
+              month: 'long',
+              year: 'numeric',
+              hour: 'numeric',
+              minute: 'numeric',
+              hour12: true,
+              timeZone: timezoneSelect.value
+            }
+            const dateString = appointment.toLocaleDateString('en-GB', options);
+            //const dateString = appointment.toUTCString();
+            const appDiv = `<label for="${isoAppointment}">${dateString} <span style="display: none;" id="${isoAppointment}-quantity" class="quantity"></span></label><input name="iso-appointment" type="radio" id="${isoAppointment}" value="${isoAppointment}" onchange="readableDate.value='${dateString}';">`
+            if(appDiv in dateObj) {
+              dateObj[appDiv] += 1;
+            }
+            else {
+              dateObj[appDiv] = 1;
+            }
+          }
+          Object.keys(dateObj).forEach(dateString => {
+            let dateDiv = document.createElement('div');
+            dateDiv.innerHTML = dateString;
+            appQuantity = dateDiv.querySelector('span.quantity');
+            appQuantity.innerHTML = `(${dateObj[dateString]})`;
+            appointmentList.appendChild(dateDiv);
+            //Continue Here
+          });
+        }
+        prevMonthButton.addEventListener('click', prevMonth);
+        nextMonthButton.addEventListener('click', nextMonth);
+        calendar.style.opacity = 1;
+        loadingDiv.style.display = 'none';
+      })
+    }
+
+    showAppsFor.addEventListener('change', e => {
+      clearDateRows();
+      markAvailableAppointments(dates);
+    })
+
+    timezoneSelect.addEventListener('change', e => {
+      clearDateRows();
+      markAvailableAppointments(dates);
+    })
+    //Continue
+    
+    let prevMonthButton = document.querySelector('#previous-month');
+    let nextMonthButton = document.querySelector('#next-month');
+
+    prevMonthButton.addEventListener('click', prevMonth);
+    nextMonthButton.addEventListener('click', nextMonth);
+
+    injectDates();
+  </script>
+    {% endif %}
+{% endblock %}

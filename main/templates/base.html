@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Edu+TAS+Beginner:wght@400&family=Karla&display=swap" rel="stylesheet">
+    <script src="https://js.stripe.com/v3/"></script>
+    <style>
+      :root {
+        --primary-color: #263771;
+        --nav-height: 50px;
+      }
+      
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: 'Karla', 'Edu TAS Beginner', cursive, monospace;
+      }
+
+     *:not(select, input, button, .popup-form *, option, textarea, td, .nowhite) {
+        color: white;
+      }
+
+      #message, #warning {
+        margin: 100px auto;
+        text-align: center;
+        color: green;
+        font-size: 25px;
+      }
+
+      #warning {
+        color: red;
+      }
+
+      a:not(footer > p > a) {
+        text-decoration: none;
+        color: black;
+      }
+
+      body {
+        /*background-image: linear-gradient(to right, #8360c3, #2ebf91);*/
+        background-color: #172145;
+      }
+
+      main {
+        margin-top: 50px;
+      }
+      
+      nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: var(--nav-height);
+        background-color: var(--primary-color);
+        box-shadow: 0 0 20px black;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 5px;
+        z-index: 1;
+      }
+
+      #site-name {
+        display: flex;
+        font-family: 'Edu TAS Beginner', monospace;
+        font-size: 30px;
+        align-items: center;
+        gap: 3px;
+      }
+
+      #site-name > img {
+        height: 30px;
+      }
+
+      #menu-button {
+        width: 40px;
+        height: 70%;
+        display: grid;
+        align-items: center;
+        border-radius: 50%;
+        padding: 7px;
+      }
+
+      #menu-button:hover {
+        transform: scale(1.2);
+        cursor: pointer;
+      }
+
+      #menu-button:active {
+        transform: scale(1);
+      }
+
+      .bar {
+        width: 80%;
+        height: 22%;
+        background-color: white;
+        margin: 0 auto;
+      }
+
+      #menu-fullscreen {
+        display: none;
+      }
+
+      #menu {
+        position: fixed;
+        z-index: 1;
+        width: 120px;
+        display: grid;
+        text-align: center;
+        align-items: center;
+        font-family: "Edu TAS Beginner", monospace;
+        top: var(--nav-height);
+        right: 0;
+        background-color: var(--primary-color);
+        border: 1px solid black;
+        border-top: 0;
+        border-right: 0;
+        transition: 500ms ease-out;
+      }
+
+      #menu > a {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+      }
+
+      .menu-visible {
+        height: 300px;
+      }
+
+      .menu-hidden {
+        height: 0;
+        visibility: hidden;
+      }
+
+      .menu-visible * {
+        opacity: 1;
+        transition: 400ms linear;
+      }
+
+      .menu-hidden * {
+        opacity: 0;
+        transition: 100ms linear;
+      }
+
+      footer {
+        position: relative;
+        width: 100%;
+        height: 90px;
+        background-color: var(--primary-color);
+        margin-top: 100px;
+        box-shadow: 0 0 20px black;
+      }
+
+      footer > p {
+        position: absolute;
+        bottom: 5%;
+        right: 5%;
+      }
+
+      @media only screen and (min-width: 875px) {
+        #menu-button, #menu {
+          display: none;
+        }
+
+        #menu-fullscreen {
+          display: flex;
+          font-family: "Edu TAS Beginner", monospace;
+        }
+
+        #menu-fullscreen > a {
+          display: flex;
+          margin: 0 25px 0 5px;
+          gap: 7.5px;
+        }
+      }
+
+      
+    </style>
+    {% block head %}{% endblock %}
+  </head>
+  <body>
+    <nav>
+      <a href="/">
+        <div id="site-name">
+          <img src="https://cdn-icons-png.flaticon.com/512/876/876759.png" alt="Logo" />
+          <span>PotterBook</span>
+        </div>
+      </a>
+      <div id="menu-button">
+        <div id="bar-one" class="bar"></div>
+        <div id="bar-two" class="bar"></div>
+        <div id="bar-three" class="bar"></div>
+      </div>
+      <div id="menu-fullscreen">
+        <a href="{% url 'home' %}">
+        <div>Home</div>
+      </a>
+      <a href="{% url 'pricing_page'%}">
+        <div>Pricing</div>
+      </a>
+      <a href="{% url 'contact_page' %}">
+        <div>Contact</div>
+      </a>
+      {% if user.is_authenticated == False %}
+      <a href="{% url 'register' %}">
+        <div>Register</div>
+      </a>
+      <a href="{% url 'login' %}">
+        <div>Login</div>
+      </a>
+      {% elif user.is_authenticated %}
+      <a href="{% url 'profile' %}">
+        <div>Profile</div>
+      </a>
+      <a href="{% url 'logout' %}">
+        <div>Logout</div>
+      </a>
+      {% endif %}
+      </div>
+    </nav>
+    <section id="menu" class="menu-hidden">
+      <a href="{% url 'home' %}">
+        <div>Home</div>
+      </a>
+      <a href="{% url 'pricing_page'%}">
+        <div>Pricing</div>
+      </a>
+      <a href="{% url 'contact_page' %}">
+        <div>Contact</div>
+      </a>
+      {% if user.is_authenticated == False %}
+      <a href="{% url 'register' %}">
+        <div>Register</div>
+      </a>
+      <a href="{% url 'login' %}">
+        <div>Login</div>
+      </a>
+      {% elif user.is_authenticated %}
+     <a href="{% url 'profile' %}">
+        <div>Profile</div>
+      </a> 
+      <a href="{% url 'logout' %}">
+        <div>Logout</div>
+      </a>
+      {% endif %}
+    </section>
+    <main>
+      {% if message %}
+      <div id="message">{{message}}</div>
+      {% elif warning %}
+      <div id="warning">{{warning}}</div>
+      {% endif %}
+      {% block main %} {% endblock %}
+    </main>
+    <footer>
+      <p>Developed by <a href="https://www.kieranoldfield.co.uk" target="_blank">Kieran Oldfield</a></p>
+    </footer>
+    <script type="text/javascript">
+      let menuButton = document.getElementById('menu-button');
+      let menu = document.getElementById('menu');
+
+      menuButton.addEventListener('click', () => {
+        if(menu.className == 'menu-hidden') {
+          menu.className = 'menu-visible';
+        }
+        else if(menu.className == 'menu-visible') {
+          menu.className = 'menu-hidden';
+        }
+      })
+    </script>
+    {% if replace_state %}
+    <script>
+      history.replaceState(null, null, '{{replace_state}}')
+    </script>
+    {% endif %}
+  </body>
+</html>

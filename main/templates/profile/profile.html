@@ -1,0 +1,1508 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>Profile - PotterBook</title>
+<!--Calendar-->
+<style>
+  :root {
+    --circle-diameter: 40px;
+    --cross-size: 20px;
+  }
+  
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  h2 {
+    margin: 20px 0 30px 0;
+    text-align: center;
+  }
+
+  h2 span {
+    margin: 0 4px;
+  }
+
+  #loading {
+    display: none;
+    position: absolute;
+    text-align: center;
+    left: 50%;
+    transform: translate(-50%, 0);
+    height: 400px;
+    display: grid;
+    align-items: center;
+  }
+
+  table, #loading {
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+    user-select: none;
+  }
+
+  th {
+    font-size: 10px;
+  }
+
+  td {
+    margin: 10px 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  tr {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+  }
+
+  #buttons {
+    display: flex;
+    justify-content: space-evenly;
+    margin: 40px auto;
+    width: 300px;
+  }
+
+  #buttons > * {
+    width: 20px;
+    height: 20px;
+    border: 5px solid white;
+    background-color: transparent;
+    border-bottom: none;
+    border-right: none;
+  }
+
+  #previous-month {
+    transform: rotate(-45deg);
+  }
+
+  #next-month {
+    transform: rotate(135deg);
+  }
+
+  #previous-month:hover, #next-month:hover {
+    cursor: pointer;
+    border: 5px solid green;
+    border-bottom: none;
+    border-right: none;
+  }
+
+  .date-row > td[style]:hover {
+    transform: scale(1.5);
+    cursor: pointer;
+  }
+
+  .date-row > td {
+    border-radius: 50%;
+    width: var(--circle-diameter);
+    height: var(--circle-diameter);
+  }
+
+  #show-apps-for-div, #timezone-div {
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+  }
+
+  #edit_availability_form {
+    width: 90%;
+    max-width: 500px;
+    margin: 120px auto;
+  }
+
+  #update_schedule_button {
+    display: block;
+    margin: 10px auto;
+    cursor: pointer;
+  }
+
+  .popup-form {
+      position: fixed;
+      background-color: white;
+      color: black;
+      width: 350px;
+      border: 2px solid navy;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      border-radius: 10%;
+      box-shadow: 2px 19px 31px rgba(0, 0, 0, 0.2);
+      transition: 1s;
+      opacity: 0;
+      z-index: -1;
+    }
+
+    #form-background {
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background-color: black;
+      opacity: 0;
+      transition: 1s;
+      z-index: -1;
+    }
+  
+  .popup-cross {
+    height: var(--cross-size);
+    width: var(--cross-size);
+    position: absolute;
+    right: 25px;
+    top: 15px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+  }
+
+  .service-cross {
+    position: relative;
+    right: -4px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    width: 10px;
+    height: 10px;
+  }
+  
+  .cross, .ser-cross {
+    height: 2px;
+    width: 100%;
+    background-color: navy;
+    position: absolute;
+  }
+
+  .ser-cross {
+    background-color: white;
+  }
+  
+  .cross.one, .ser-cross.one {
+    transform: rotate(45deg);
+  }
+  
+  .cross.two, .ser-cross.two {
+    transform: rotate(-45deg);
+  }
+  
+  #appointment-container > h2 {
+    margin: 50px auto 30px auto;
+    text-align: center;
+    color: navy;
+  }
+  
+  #appointments {
+    width: 80%;
+    max-height: 200px;
+    border: 1px solid black;
+    margin: 30px auto 70px auto;
+    overflow-y: scroll;
+  }
+  
+  #appointments > div {
+    display: flex;
+    justify-content: space-evenly;
+    padding: 10px 0;
+  }
+  
+  #appointments > div:not(:last-of-type) {
+    border-bottom: 2px solid black;
+  }
+  
+  #appointments > div > label {
+    padding: 20px 0;
+  }
+  
+  .popup-button {
+    color: #fff;
+    width: 130px;
+    text-align: center;
+    margin: 40px auto 20px auto;
+    padding: 12.5px 35px 12.5px 25px;
+    border-radius: 100px;
+    background-color: #4C43CD;
+    background-image: radial-gradient(93% 87% at 87% 89%, rgba(0, 0, 0, 0.23) 0%, transparent 86.18%), radial-gradient(66% 87% at 26% 20%, rgba(255, 255, 255, 0.41) 0%, rgba(255, 255, 255, 0) 69.79%, rgba(255, 255, 255, 0) 100%);
+    box-shadow: 2px 19px 31px rgba(0, 0, 0, 0.2);
+    font-weight: bold;
+    font-size: 16px;
+    user-select: none;
+    touch-action: manipulation;
+    cursor: pointer;
+  }
+</style>
+<!--Calendar-->
+<style>
+  :root {
+    --photo-hw: 200px;
+  }
+
+  #business_name {
+    text-align: center;
+    margin: 100px auto 0 auto;
+    color: white;
+    width: calc(var(--photo-hw) + 150px);
+  }
+
+  #business-bio > h2 {
+    text-decoration: underline;
+  }
+
+  #business-bio > form {
+    display: grid;
+    margin: 0 auto 50px auto;
+    width: 400px;
+  }
+
+  #business-bio > form > button {
+    width: 80px;
+    margin: 15px auto 0 auto;
+  }
+
+  #edit-business-name {
+    text-decoration: underline;
+    text-align: center;
+    font-size: 12px;
+    width: 30px;
+    margin: 0 auto;
+    color: lightgreen;
+    user-select: none;
+    cursor: pointer;
+  }
+
+  #business-url {
+    display: grid;
+    text-align: center;
+  }
+
+  #business-url > a {
+    color: white;
+    text-decoration: underline;
+  }
+
+  #qr-code {
+    display: block;
+    margin: 0 auto;
+  }
+
+  #business-url, #qr-code {
+    width: 80%;
+    max-width: 400px;
+    margin: 0 auto;
+  }
+
+  #profile-image-container {
+    position: relative;
+    margin: 50px auto 50px auto;
+    height: var(--photo-hw);
+    width: var(--photo-hw);
+  }
+  
+  #profile-image {
+    display: block;
+    height: var(--photo-hw);
+    width: var(--photo-hw);
+    object-fit: cover;
+    object-position: 50% 50%;
+    border-radius: 50%;
+  }
+
+  #photomenu-cover {
+    height: var(--photo-hw);
+    width: var(--photo-hw);
+    border-radius: 50%;
+    background-color: black;
+    opacity: 50%;
+    position: absolute;
+    top: 0;
+  }
+
+  label[for="new-profile-photo"] {
+    cursor: pointer;
+  }
+
+  #photomenu {
+    height: var(--photo-hw);
+    width: var(--photo-hw);
+    position: absolute;
+    top: 20px;
+    display: grid;
+    align-items: space-evenly;
+    text-align: center;
+    padding: 20px 0;
+  }
+  
+  #photomenu, #photomenu-cover {
+    transition: 1s;
+  }
+
+  #photomenu * {
+    color: white;
+  }
+
+  #photomenu hr {
+    height: 1px;
+    width: 90%;
+    margin: 0 auto;
+  }
+
+  #new-profile-photo {
+    display: none;
+  }
+
+  #stripe-button {
+  margin: 0 auto 50px auto;
+  display: flex;
+  align-items: center;
+  appearance: none;
+  background-image: radial-gradient(100% 100% at 100% 0, #5adaff 0, #5468ff 100%);
+  border: 0;
+  border-radius: 6px;
+  box-shadow: rgba(45, 35, 66, .4) 0 2px 4px,rgba(45, 35, 66, .3) 0 7px 13px -3px,rgba(58, 65, 111, .5) 0 -3px 0 inset;
+  box-sizing: border-box;
+  color: #fff;
+  cursor: pointer;
+  font-family: "JetBrains Mono",monospace;
+  height: 48px;
+  width: 150px;
+  justify-content: center;
+  line-height: 1;
+  list-style: none;
+  overflow: hidden;
+  padding-left: 16px;
+  padding-right: 16px;
+  position: relative;
+  text-align: left;
+  text-decoration: none;
+  transition: box-shadow .15s,transform .15s;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  white-space: nowrap;
+  will-change: box-shadow,transform;
+  font-size: 18px;
+}
+
+  #service-heading {
+    position: relative;
+    display: flex;
+    margin: 0 auto;
+    width: 80%;
+    max-width: 400px;
+    justify-content: center;
+    align-items: center;
+  }
+
+  #add-service {
+    width: 25px;
+    height: 25px;
+    cursor: pointer;
+    position: absolute;
+    right: 10px;
+    display: flex;
+    align-items: center;
+  }
+
+  .add-bar {
+    position: absolute;
+    height: 2px;
+    width: 100%;
+    background-color: green;
+  }
+
+  .add-bar.two {
+    transform: rotate(90deg);
+  }
+
+  #service-list {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0 auto;
+    width: 80%;
+    max-width: 400px;
+    min-height: 150px;
+    border: 2px solid white;
+    padding: 20px;
+  }
+
+  .service {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 0 0 auto;
+    margin-right: 10px;
+    font-size: 13px;
+    border: 2px solid white;
+    border-radius: 20%;
+    height: 17.5px;
+    user-select: none;
+  }
+
+  .servicespan:hover {
+    color: green;
+    transform: scale(1.05);
+    cursor: pointer;
+  }
+
+  .service-info-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    margin: 0 auto;
+    width: 70%;
+  }
+
+  .service-info-section > * {
+    margin: 10px 0;
+  }
+
+  .pounds-input {
+    width: 50px;
+  }
+
+  .pence-input {
+    width: 25px;
+  }
+
+  .pounds-input, .pence-input {
+    text-align: center;
+    border: 1px solid black;
+  }
+
+  .service-name-input {
+    border: 1px solid black;
+  }
+
+  #tz-pref-div {
+    display: grid;
+    text-align: center;
+    margin: 50px auto;
+    width: 80%;
+    max-width: 400px;
+  }
+
+  #tz-pref {
+    text-align: center;
+  }
+
+</style>
+{% if stripe_linked == False %}
+<style>
+#stripe-button:focus {
+  box-shadow: #3c4fe0 0 0 0 1.5px inset, rgba(45, 35, 66, .4) 0 2px 4px, rgba(45, 35, 66, .3) 0 7px 13px -3px, #3c4fe0 0 -3px 0 inset;
+}
+
+#stripe-button:hover {
+  box-shadow: rgba(45, 35, 66, .4) 0 4px 8px, rgba(45, 35, 66, .3) 0 7px 13px -3px, #3c4fe0 0 -3px 0 inset;
+  transform: translateY(-2px);
+}
+
+#stripe-button:active {
+  box-shadow: #3c4fe0 0 3px 7px inset;
+  transform: translateY(2px);
+}
+
+#stripe-msg {
+  margin: 0 auto;
+  width: 150px;
+  text-align: center;
+  font-size: 12px;
+  margin-bottom: 50px;
+}
+
+#stripe-button {
+  margin-bottom: 2px;
+}
+  
+</style>
+{% elif stripe_linked %}
+<style>
+  #stripe-button {
+    background-image: radial-gradient(100% 100% at 100% 0, cyan 0, lightgreen 100%);
+  }
+
+  #stripe-button {
+    margin-bottom: 0;
+  }
+
+  #unlink-stripe {
+    display: block;
+    text-align: center;
+    margin: 0 auto 50px auto;
+    color: white;
+    text-decoration: underline;
+  }
+</style>
+{% endif %}
+{% endblock %}
+
+{% block main %}
+{% csrf_token %}
+<h1 id="business_name">{{business_name}}</h1>
+<div id="edit-business-name">Edit</div>
+<div id="profile-image-container">
+{% if user_photo %}
+<img id="profile-image" src="{{user_photo}}" alt="Business Image">
+{% else %}
+<img id="profile-image" src="https://calendar-app.team-oldfield.repl.co/media/calendar.jpg" alt="Default Business Image">
+{% endif %}
+  
+  <div id="photomenu-cover" style='visibility: hidden; opacity: 0;'></div>
+  <div id="photomenu" style='visibility: hidden; opacity: 0;'>
+    <input type="file" name="new-profile-photo" id="new-profile-photo" accept="image/*">
+    <label for="new-profile-photo">Upload Photo</label>
+    <hr>
+    {% if user_photo %}
+    <a id="see-fullsize-img" href="{{user_photo}}" target="_blank">See Fullsize Image</a>
+    {% else %}
+    <a id="see-fullsize-img" href="https://calendar-app.team-oldfield.repl.co/media/calendar.jpg" target="_blank">See Fullsize Image</a>
+    {% endif %}
+  </div>
+</div>
+
+<section id="business-bio">
+  <h2>Business Bio</h2>
+  <form id="business-bio-form">
+    <textarea name="business-bio" rows="15" maxlength="{{business_bio_length}}">{% if business_bio %}{{business_bio}}{% endif %}</textarea>
+    <button>Edit Bio</button>
+  </form>
+</section>
+
+{% if stripe_linked %}
+<div id="stripe-button">Stripe Linked</div>
+<a id="unlink-stripe" href="{% url 'disconnect' %}">Unlink</a>
+{% else %}
+<a id="stripe-button" href="{{auth_url}}">Link Stripe</a>
+<div id="stripe-msg">to make your schedule available!</div>
+{% endif %}
+
+<div id="service-heading">
+  <h2>Services</h2>
+  <div id="add-service">
+    <div class="add-bar one"></div>
+    <div class="add-bar two"></div>
+  </div>
+</div>
+<section id="service-list">
+  {% for service in business_services %}
+   <div class="service"><span id="servicespan-{{service.1}}" class="servicespan">{{service.0.service}} @ £{{service.2}}</span><div class="service-cross"><div class="ser-cross one"></div><div class="ser-cross two"></div></div><input type="hidden" id="service-{{service.1}}" name="service-update" value='{"service": "{{service.0.service}}", "price": "{{service.0.price}}", "currency": "{{service.0.currency}}"}'></div>
+  {% endfor %}
+</section>
+
+<!--Calendar-->
+  <h2><span id="month"></span><span id="year"></span></h2>
+  <div id="loading">
+    <div>Loading...</div>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th>Sunday</th>
+        <th>Monday</th>
+        <th>Tuesday</th>
+        <th>Wednesday</th>
+        <th>Thursday</th>
+        <th>Friday</th>
+        <th>Saturday</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="date-row" id="date-row-1">
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr class="date-row" id="date-row-2">
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr class="date-row" id="date-row-3">
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr class="date-row" id="date-row-4">
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr class="date-row" id="date-row-5">
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr class="date-row" id="date-row-6">
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div id="show-apps-for-div">
+    <label for="show-apps-for">Show appointments for: </label>
+    <select id="show-apps-for" name="show-apps-for">
+      <option value="all_services" checked>All Services</option>
+      {% for service in business_services %}
+      <option value="{{service.0.service}}">{{service.0.service}}</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <div id="timezone-div">
+    <label for="timezone">Timezone: </label>
+    <select id="timezone" name="timezone">
+      <option value='UTC'>UTC</option>
+      <!--Filled with JS-->
+    </select>
+  </div>
+  
+  <div id="buttons">
+    <button type="button" id="previous-month"></button>
+    <button type="button" id="next-month"></button>
+  </div>
+
+  <form id="edit_availability_form" action="{% url 'edit_availability' %}" method="post">
+    {% csrf_token %}
+    <div>
+      <select name="action" required>
+        <option value="MMA">Make me available</option>
+        <option value="CMS">Clear my schedule</option>
+      </select>
+      for service
+      <select id="services-for-appointments" name="services-for-appointments">
+        {% for service in business_services %}
+        <option value="{{service.0.service}}">{{service.0.service}}</option>
+        {% endfor %}
+      </select>
+      every
+      <select name="weekdays" multiple required>
+        <option value="6">Sunday</option>
+        <option value="0">Monday</option>
+        <option value="1">Tuesday</option>
+        <option value="2">Wednesday</option>
+        <option value="3">Thursday</option>
+        <option value="4">Friday</option>
+        <option value="5">Saturday</option>
+      </select>
+      @
+      <select name="time" multiple required>
+        <!--Filled with JS-->
+      </select>
+      for the next
+      <select name="quantityDaysWeeksMonths" required>
+        <!--Filled with JS-->
+      </select>
+      <select name="weeksMonthsYears" required>
+        <option value="weeks">weeks</option>
+        <option value="months">months</option>
+        <option value="years">years</option>
+      </select>
+      in timezone 
+      <select id="ee-timezone" name="ee-timezone">
+        <option value="UTC">UTC</option>
+        <!--Filled with JS-->
+      </select>
+    </div>
+    <input type="hidden" name="timezone-offset">
+    <button id="update_schedule_button" type="submit">Update Schedule</button>
+  </form>
+  <img id="qr-code" src="{{business_qr}}" alt="Business QR Code">
+  <div id="business-url"></div>
+
+  <div id="tz-pref-div">
+    <label for="tz-pref">Preferred Timezone for Notifications: </label>
+    <select id="tz-pref" name="tz-pref">
+      <option value="UTC">UTC</option>
+      <!--Filled with JS-->
+    </select>
+  </div>
+
+<div id="form-background"></div>
+<!--Appointment Form-->
+          <form id="appointment-container" class="popup-form" method="post" action="{% url 'book_slot' business_slug %}">
+            <input type="hidden" name="readable-date">
+            {% csrf_token %}
+            <div id="appointment-form-cross" class="popup-cross">
+                <div class="cross one"></div>
+                <div class="cross two"></div>
+            </div>
+            <h2>Appointments</h2>
+            <section id="appointments">
+              <!--Filled with JS-->
+            </section>
+        </form>
+<!--Appointment Form-->
+
+<!--New Service Form-->
+          <form id="service-container" class="popup-form" method="post" action="{% url 'update_profile' %}">
+            {% csrf_token %}
+            <div id="service-form-cross" class="popup-cross">
+                <div class="cross one"></div>
+                <div class="cross two"></div>
+            </div>
+            <h2>Add your service:</h2>
+            <section id="service-info" class="service-info-section">
+              <label for="service-name">Service Name:</label>
+              <input type="text" id="service-name" class="service-name-input" name="service-name" pattern="/^[a-zA-Z0-9\s]+$/">
+              <label>Price:</label>
+              <div>
+                £
+                <input class="pounds-input" type="text" minlength="1" name="pounds"> .
+                <input class="pence-input" type="text" minlength="2" maxlength="2" name="pence">
+              </div>
+              
+            </section>
+            <div id="add-service-submit" class="popup-button">Add Service</div>
+          </form>
+<!--New Service Form-->
+
+<!--Edit Service Form-->
+          <form id="edit-service-container" class="popup-form" method="post" action="{% url 'update_profile' %}">
+            <input type="hidden" name="hidden-service-name">
+            <input type="hidden" name="hidden-service-price">
+            <input type="hidden" name="hidden-service-currency">
+            {% csrf_token %}
+            <div id="edit-service-form-cross" class="popup-cross">
+                <div class="cross one"></div>
+                <div class="cross two"></div>
+            </div>
+            <h2>Edit your service:</h2>
+            <section id="edit-service-info" class="service-info-section">
+              <label for="edit-service-name">Service Name:</label>
+              <input type="text" id="edit-service-name" class="service-name-input" name="edit-service-name" pattern="/^[a-zA-Z0-9\s]+$/">
+              <label>Price:</label>
+              <div>
+                £
+                <input class="pounds-input" type="text" minlength="1" name="edit-pounds"> .
+                <input class="pence-input" type="text" minlength="2" maxlength="2" name="edit-pence">
+              </div>
+              
+            </section>
+            <div id="edit-service-submit" class="popup-button">Edit Service</div>
+          </form>
+<!--Edit Service Form-->
+  
+  <script>
+    let oneToArgFunc = daysOfMonth => Array.from({length: daysOfMonth}, (_, i) => i + 1);
+    let thirtyDays = oneToArgFunc(30);
+    let thirtyOneDays = oneToArgFunc(31);
+    let twentyFourHours = Array.from({length: 24}, (_,i) => i);
+    let everyFiveMins = Array.from({length: 12}, (_,i) => i * 5);
+    let times = document.querySelector('select[name="time"]');
+    let quantityDaysWeeksMonths = document.querySelector('select[name="quantityDaysWeeksMonths"]');
+    const appointmentContainer = document.querySelector('#appointment-container');
+    const formBackground = document.querySelector('#form-background');
+    const appointmentList = document.querySelector('#appointments');
+    const acCloseButton = document.querySelector('#appointment-form-cross');
+    const readableDate = document.querySelector('input[name="readable-date"]');
+    const timezoneOffset = document.querySelector('[name="timezone-offset"]');
+    const editAvailabilityForm = document.querySelector('#edit_availability_form');
+
+    acCloseButton.addEventListener('click', async () => {
+      appointmentContainer.style.opacity = 0;
+      formBackground.style.opacity = 0;
+      await new Promise((resolve, reject) => {
+        appointmentContainer.addEventListener('transitionend', () => resolve());
+      });
+      appointmentContainer.style.zIndex = -1;
+      formBackground.style.zIndex = -1;
+      appointmentList.innerHTML = '';
+    });
+
+    oneToArgFunc(100).forEach(number => {
+      let optionNode = document.createElement('option');
+      optionNode.innerHTML = number;
+      optionNode.value = number;
+      quantityDaysWeeksMonths.appendChild(optionNode);
+    })
+
+    twentyFourHours.forEach(hour => {
+      everyFiveMins.forEach(minute => {
+        let timeString = ""
+        if(String(hour).length === 1) {
+          timeString += `0${hour}:`;
+        }
+        else {
+          timeString += `${hour}:`;
+        }
+        if(String(minute).length === 1) {
+          timeString += `0${minute}`;
+        }
+        else {
+          timeString += String(minute);
+        }
+        let optionNode = document.createElement('option');
+        optionNode.innerHTML = timeString;
+        optionNode.value = timeString;
+        times.appendChild(optionNode);
+      })
+    })
+
+    let monthsAndDates = [
+      ['January', thirtyOneDays],
+      ['February', [oneToArgFunc(28), oneToArgFunc(29)]],
+      ['March', thirtyOneDays],
+      ['April', thirtyDays],
+      ['May', thirtyOneDays],
+      ['June', thirtyDays],
+      ['July', thirtyOneDays],
+      ['August', thirtyOneDays],
+      ['September', thirtyDays],
+      ['October', thirtyOneDays],
+      ['November', thirtyDays],
+      ['December', thirtyOneDays]
+    ]
+
+    let today = new Date();
+    timezoneOffset.value = today.getTimezoneOffset();
+    month = document.querySelector('#month');
+    year = document.querySelector('#year');
+
+    month.innerHTML = today.toLocaleDateString('en-GB', {month: 'long'});
+    year.innerHTML = today.getFullYear();
+
+
+    let dateCount = new Date(today.getFullYear(), today.getMonth(), 1).getDay();
+    let monthCount = today.getMonth();
+
+    let nextMonth = () => {
+      monthCount++;
+      if(monthCount > 11) {
+        monthCount = 0;
+        year.innerHTML++;
+      }
+      month.innerHTML = monthsAndDates[monthCount][0];
+      dateCount = new Date(year.innerHTML, monthCount, 1).getDay();
+      injectDates();
+    }
+
+    let prevMonth = () => {
+      monthCount--;
+      if(monthCount < 0) {
+        monthCount = 11;
+        year.innerHTML--;
+      }
+      month.innerHTML = monthsAndDates[monthCount][0];
+      dateCount = new Date(year.innerHTML, monthCount, 1).getDay();
+      injectDates();
+    }
+
+    let dates
+    let injectDates = () => {
+      if(month.innerHTML === 'February') {
+        if(year.innerHTML % 4 === 0) {
+          dates = monthsAndDates[monthCount][1][1];
+        }
+        else {
+          dates = monthsAndDates[monthCount][1][0];
+        }
+      }
+      else {
+        dates = monthsAndDates[monthCount][1];
+      }
+      clearDateRows(hardClear=true);
+      let rowCount = 1;
+      for(let i = 0; i < dates.length; i++) {
+        if(dateCount > 6) {
+          dateCount = 0;
+          rowCount++
+        }
+        let dateBox = document.querySelector(`#date-row-${rowCount}`).children[dateCount];
+        dateBox.innerHTML = dates[i];
+        dateBox.id = `date-${dates[i]}`;
+
+        if(today.getFullYear() === parseInt(year.innerHTML) && today.getMonth() === monthCount && today.getDate() === dates[i]) {
+
+          dateBox.style.border = '2px solid white'
+        }
+        
+        dateCount++;
+      }
+      markAvailableAppointments(dates);
+    }
+
+    const dateRows = document.querySelectorAll('.date-row');
+
+    const clearDateRows = (hardClear=false) => {
+      for(let i = 0; i < dateRows.length; i++) {
+        for(let j = 0; j < dateRows[i].children.length; j++) {
+          if(hardClear == true) {
+          dateRows[i].children[j].innerHTML = '';
+          dateRows[i].children[j].removeAttribute('id');
+          }
+          dateRows[i].children[j].removeAttribute('style');
+          dateRows[i].children[j].onclick = '';
+        }
+      }
+    }
+    //Continue
+    const timezoneSelect = document.querySelector('#timezone');
+    const eeTimezoneSelect = document.querySelector('#ee-timezone');
+    const prefTimezoneSelect = document.querySelector('#tz-pref');
+    const showAppsFor = document.querySelector('#show-apps-for');
+    const calendar = document.querySelector('table');
+    const loadingDiv = document.querySelector('#loading');
+
+    const localTz = Intl.DateTimeFormat().resolvedOptions().timeZone
+    Intl.supportedValuesOf('timeZone').forEach(tz => {
+      const optionTz = document.createElement('option');
+      optionTz.innerHTML = tz;
+      optionTz.value = tz;
+      const optionTzTwo = optionTz.cloneNode(true);
+      const optionTzThree = optionTz.cloneNode(true);
+      timezoneSelect.appendChild(optionTz);
+      eeTimezoneSelect.appendChild(optionTzTwo);
+      prefTimezoneSelect.appendChild(optionTzThree);
+      if(tz == localTz) {
+        optionTz.selected = true;
+        optionTzTwo.selected = true;
+      }
+    })
+
+    const pref_tz_children = document.querySelectorAll('#tz-pref *');
+    pref_tz_children.forEach(tz => {
+      if(tz.value == '{{pref_tz}}') {
+        tz.selected = true;
+      }
+    })
+
+    prefTimezoneSelect.addEventListener('change', e => {
+      const csrfToken = document.querySelector('[name="csrfmiddlewaretoken"]').value;
+      const url = '{% url "update_profile" %}'
+      const formData = new FormData()
+      formData.append('tz-pref', prefTimezoneSelect. value);
+      const params = {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'X-CSRFToken': csrfToken
+        }
+      }
+      fetch(url, params)
+      .then(res => res.json())
+      .then(res => {
+        if(res.pref_tz != null) {
+          alert('Preferred timezone has been succesfully updated!');
+          window.location.reload();
+        }
+        else {
+          alert('Something went wrong. Please try again.');
+        }
+      })
+    })
+    
+    let markAvailableAppointments = async monthsAndDates => {
+      prevMonthButton.removeEventListener('click', prevMonth);
+      nextMonthButton.removeEventListener('click', nextMonth);
+      calendar.style.opacity = '30%';
+      loadingDiv.style.display = 'grid';
+      const url = '{% url "retreive_dates" slug=business_slug %}';
+      const csrfToken = document.querySelector('[name="csrfmiddlewaretoken"]').value;
+      let dates = [];
+      monthsAndDates.forEach(day => {
+        let date = new Date(Date.UTC(
+          parseInt(year.innerHTML),
+          monthCount,
+          day
+        ));
+        date = date.toISOString();
+        dates.push(date);
+      });
+      let data = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': csrfToken,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          dates: dates,
+          service: showAppsFor.value,
+          timezone: timezoneSelect.value
+        })
+      });
+      data = await data.json();
+      if(data.dates === null) {
+        prevMonthButton.addEventListener('click', prevMonth);
+        nextMonthButton.addEventListener('click', nextMonth);
+        calendar.style.opacity = 1;
+        loadingDiv.style.display = 'none';
+        return;
+      }
+      data.dates.forEach(date => {
+        let fully_booked = false;
+        for(let i = 0, booked = 0; i < date[1].length; i++) {
+          if(date[1][i][1] === true) {
+            booked++;
+          }
+          if(booked === date[1].length) {
+            fully_booked = true;
+          }
+        }
+        if(fully_booked === true) {
+          prevMonthButton.addEventListener('click', prevMonth);
+          nextMonthButton.addEventListener('click', nextMonth);
+          calendar.style.opacity = 1;
+          loadingDiv.style.display = 'none';
+          return;
+        }
+        const dateObj = new Date(date[0]);
+        const dateBox = document.querySelector(`#date-${dateObj.getDate()}`);
+        dateBox.style.backgroundColor = 'lightgreen';
+        dateBox.onclick = () => {
+          //Write logic to make list of times here
+          appointmentContainer.style.zIndex = '1';
+          appointmentContainer.style.opacity = '1';
+          formBackground.style.zIndex = '1';
+          formBackground.style.opacity = '20%';
+          let dateObj = {};
+          for(let i = 0; i < date[1].length; i++) {
+            const is_booked = date[1][i][1];
+            if(is_booked === true) {
+              continue;
+            }
+            const isoAppointment = date[1][i][0];
+            let appointment = new Date(isoAppointment);
+            const options = {
+              weekday: 'short',
+              day: 'numeric',
+              month: 'long',
+              year: 'numeric',
+              hour: 'numeric',
+              minute: 'numeric',
+              hour12: true,
+              timeZone: timezoneSelect.value
+            }
+            const dateString = appointment.toLocaleDateString('en-GB', options);
+            //const dateString = appointment.toUTCString();
+            const appDiv = `<label for="${isoAppointment}">${dateString} <span id="${isoAppointment}-quantity" class="quantity"></span></label>`
+            if(appDiv in dateObj) {
+              dateObj[appDiv] += 1;
+            }
+            else {
+              dateObj[appDiv] = 1;
+            }
+          }
+          Object.keys(dateObj).forEach(dateString => {
+            let dateDiv = document.createElement('div');
+            dateDiv.innerHTML = dateString;
+            appQuantity = dateDiv.querySelector('span.quantity');
+            appQuantity.innerHTML = `(${dateObj[dateString]})`;
+            appointmentList.appendChild(dateDiv);
+            //Continue Here
+          });
+        }
+        prevMonthButton.addEventListener('click', prevMonth);
+        nextMonthButton.addEventListener('click', nextMonth);
+        calendar.style.opacity = 1;
+        loadingDiv.style.display = 'none';
+      })
+    }
+
+    showAppsFor.addEventListener('change', e => {
+      clearDateRows();
+      markAvailableAppointments(dates);
+    })
+
+    timezoneSelect.addEventListener('change', e => {
+      clearDateRows();
+      markAvailableAppointments(dates);
+    })
+    //Continue
+    
+    let prevMonthButton = document.querySelector('#previous-month');
+    let nextMonthButton = document.querySelector('#next-month');
+
+    prevMonthButton.addEventListener('click', prevMonth);
+    nextMonthButton.addEventListener('click', nextMonth);
+
+    injectDates();
+
+    editAvailabilityForm.addEventListener('submit', e => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const url = '{% url "edit_availability" %}';
+      fetch(url, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'X-CSRFToken': csrfToken.value
+        }
+      })
+      .then(res => res.json())
+      .then(res => {
+        if('message' in res) {
+          alert(res.message)
+          clearDateRows();
+          markAvailableAppointments(dates);
+        }
+        else if('warning' in res) {
+          alert(res.warning);
+        }
+      })
+    })
+
+
+  </script>
+<!--Calendar-->
+
+<script>
+  const businessName = document.querySelector('#business_name');
+  const businessURL = document.querySelector('#business-url');
+  const businessBioForm = document.querySelector('#business-bio-form');
+  const businessBio = document.querySelector('textarea[name="business-bio"]');
+  const editBusinessButton = document.querySelector('#edit-business-name');
+  const qrCode = document.querySelector('#qr-code');
+  const profileImageContainer = document.querySelector('#profile-image-container');
+  const profileImage = document.querySelector('#profile-image');
+  const seeFullsizeImg = document.querySelector('#see-fullsize-img');
+  const photoMenu = document.querySelector('#photomenu');
+  const photoMenuCover = document.querySelector('#photomenu-cover');
+  const newProfilePhoto = document.querySelector('#new-profile-photo');
+  const csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]');
+  const serviceContainer = document.querySelector('#service-container');
+  const serviceCloseButton = document.querySelector('#service-form-cross');
+  const addServiceSubmit = document.querySelector('#add-service-submit');
+  const addService = document.querySelector('#add-service');
+  const serviceList = document.querySelector('#service-list');
+  const serviceCrosses = document.querySelectorAll('.service-cross');
+
+  addService.addEventListener('click', e => {
+      serviceContainer.style.zIndex = '1';
+      serviceContainer.style.opacity = '1';
+      formBackground.style.zIndex = '1';
+      formBackground.style.opacity = '20%';
+    })
+
+  serviceCloseButton.addEventListener('click', async () => {
+      serviceContainer.style.opacity = 0;
+      formBackground.style.opacity = 0;
+      await new Promise((resolve, reject) => {
+        serviceContainer.addEventListener('transitionend', () => resolve());
+      });
+      serviceContainer.style.zIndex = -1;
+      formBackground.style.zIndex = -1;
+    });
+
+  businessURL.innerHTML = `<b>Business URL: </b><a href='{{business_url}}'>https://${window.location.host}{{business_url}}</a>`;
+
+  let eventListenOnce = (event, element) => {
+    return new Promise((resolve, reject) => {
+      let listenFunc = () => {
+
+        resolve();
+        element.removeEventListener(event, listenFunc);
+      }
+      element.addEventListener(event, listenFunc);
+    })
+  }
+
+  let photoMenuOpen = false;
+
+profileImageContainer.addEventListener('mouseover', e => {
+  photoMenu.removeAttribute('style');
+  photoMenuCover.removeAttribute('style');
+})
+
+profileImageContainer.addEventListener('mouseout', async e => {
+    photoMenu.style.opacity = '0';
+    photoMenuCover.style.opacity = '0';
+    await eventListenOnce('transitionend', photoMenuCover);
+    photoMenu.style.visibility = 'hidden';
+    photoMenuCover.style.visibility = 'hidden';
+})
+
+  newProfilePhoto.addEventListener('change', e => {
+    let formData = new FormData();
+    formData.append('new-profile-photo', newProfilePhoto.files[0]);
+    fetch('{% url "update_profile" %}', {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'X-CSRFToken': csrfToken.value
+      }
+    })
+    .then(res => res.json())
+    .then(res => {
+      if(res.photo !== null) {
+        profileImage.src = res.photo;
+        seeFullsizeImg.href = res.photo;
+        alert('Profile image has successfully been changed!');
+      }
+      else {
+        alert('Something went wrong. Please try again.');
+      }
+    })
+  })
+
+  editBusinessButton.addEventListener('click', e => {
+    const editConfirm = confirm('Changing your business name will also change your page\'s link and QR Code. Would you like to continue?');
+    if(editConfirm == false) {
+      return;
+    }
+    let name = prompt('What would you like to change your business name to?', businessName.innerHTML);
+    if(name != null && name != '') {
+      let formData = new FormData();
+      formData.append('business_name', name);
+      fetch('{% url "update_profile" %}', {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'X-CSRFToken': csrfToken.value
+        }
+      })
+      .then(res => res.json())
+      .then(res => {
+        if(res.business_name !== null && res.business_url !== null && res.business_qr !== null) {
+          alert('Business name has successfully been changed!');
+          window.location.reload();
+        }
+        else {
+          alert('Something went wrong. Please try again.')
+        }
+      })
+      .catch(error => {
+        alert(error);
+      })
+    }
+  })
+
+  businessBioForm.addEventListener('submit', e => {
+    e.preventDefault();
+    const url = '{% url "update_profile" %}';
+    let formData = new FormData();
+    formData.append('business-bio', businessBio.value);
+    fetch(url, {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'X-CSRFToken': csrfToken.value
+      }
+    })
+    .then(res => res.json())
+    .then(res => {
+      if(res.business_bio !== null) {
+        businessBio.value = res.business_bio;
+        alert('Your business bio has successfully been changed!');
+      }
+      else {
+        alert('Something went wrong. Please try again.');
+      }
+    })
+  })
+
+  addServiceSubmit.addEventListener('click', e => {
+    const serviceName = document.querySelector('#service-name');
+    const pounds = document.querySelector('[name="pounds"]').value;
+    const pence = document.querySelector('[name="pence"]').value;
+    const serviceRegex = /^[a-zA-Z0-9\s]+$/;
+    if(serviceRegex.test(serviceName.value) == false) {
+      alert('Only words, numbers and whitespace allowed. Please try again.');
+      return;
+    }
+    try {
+      parseInt(pounds);
+      parseInt(pence);
+    }
+    catch {
+      alert('Price must be numeric. Please try again.');
+      return;
+    }
+    if(pounds.length < 1 || pence.length != 2) {
+      alert('Please format the price correctly.');
+      return
+    }
+    if(parseInt(pounds) < 5) {
+      alert('Services must have a price higher than £5.00. Please try again.');
+      return
+    }
+    if(parseInt(pence) < 0 || parseInt(pence) > 99) {
+      alert('Decimal must be between 0 and 99. Please try again.');
+      return
+    }
+    const formData = new FormData(serviceContainer);
+    const url = '{% url "update_profile" %}';
+    fetch(url, {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'X-CSRFToken': csrfToken.value
+      }
+    })
+    .then(res => res.json())
+    .then(res => {
+      if(res.service_added !== null) {
+        if(res.service_added == 'already_exists') {
+          alert('Service already exists');
+          return
+        }
+        
+        alert('Service successfully added!');
+        window.location.reload();
+      }
+      else {
+        alert('Something went wrong. Please try again.')
+      }
+    })
+  })
+
+  serviceCrosses.forEach(cross => {
+    
+    cross.addEventListener('click', e => {
+      const serviceInfo = JSON.parse(cross.parentNode.querySelector('input[type="hidden"]').value);
+      let verifyServiceDelete = confirm(`Are you sure you want to delete the service "${serviceInfo.service}"? This will remove all associated unbooked appointments.`);
+      if(verifyServiceDelete == true) {
+        const url = '{% url "update_profile" %}';
+        let formData = new FormData();
+        formData.append('delete_service', serviceInfo.service);
+        const params = {
+          method: 'POST',
+          body: formData,
+          headers: {
+            'X-CSRFToken': csrfToken.value
+          }
+        }
+        fetch(url, params)
+        .then(res => res.json())
+        .then(res => {
+          if(res.service_deleted !== null) {
+            if(res.service_deleted == 'does_not_exist') {
+              alert(`${serviceInfo.service} does not exist.`);
+              return
+            }
+            alert(`${res.service_deleted} was successfully removed.`);
+            window.location.reload();
+          }
+          else {
+            alert('Something went wrong. Please try again.')
+          }
+        })
+      }
+    })
+    
+  })
+
+  const serviceSpans = document.querySelectorAll('.servicespan');
+  const editServiceContainer = document.querySelector('#edit-service-container');
+  const editServiceCloseButton = document.querySelector('#edit-service-form-cross');
+  const editServiceSubmit = document.querySelector('#edit-service-submit');
+  const editService = document.querySelector('#edit-service');
+  const hiddenServiceName = document.querySelector('input[name="hidden-service-name"]');
+  const hiddenServicePrice = document.querySelector('input[name="hidden-service-price"]');
+  const editServiceName = document.querySelector('input[name="edit-service-name"]');
+  const editPounds = document.querySelector('input[name="edit-pounds"]');
+  const editPence = document.querySelector('input[name="edit-pence"]');
+
+  serviceSpans.forEach(span => {
+    span.addEventListener('click', e => {
+      const serviceDiv = span.parentNode;
+      let serviceInfo = JSON.parse(serviceDiv.querySelector('input[type="hidden"]').value);
+      hiddenServiceName.value = serviceInfo.service;
+      hiddenServicePrice.value = serviceInfo.price;
+      editServiceName.value = serviceInfo.service;
+      editPounds.value = serviceInfo.price.slice(0, -2);
+      editPence.value = serviceInfo.price.slice(-2);
+
+      editServiceContainer.style.zIndex = '1';
+      editServiceContainer.style.opacity = '1';
+      formBackground.style.zIndex = '1';
+      formBackground.style.opacity = '20%';
+    })
+  })
+
+  editServiceCloseButton.addEventListener('click', async e => {
+      editServiceContainer.style.opacity = 0;
+      formBackground.style.opacity = 0;
+      await new Promise((resolve, reject) => {
+        editServiceContainer.addEventListener('transitionend', () => resolve());
+      });
+      editServiceContainer.style.zIndex = -1;
+      formBackground.style.zIndex = -1;
+  })
+
+  editServiceSubmit.addEventListener('click', e => {
+    let formData = new FormData();
+    formData.append('check_service_name', hiddenServiceName.value);
+    formData.append('check_service_price', hiddenServicePrice.value);
+    formData.append('new_service_name', editServiceName.value);
+    const editServicePrice = editPounds.value + editPence.value;
+    formData.append('new_service_price', editServicePrice);
+
+    const serviceRegex = /^[a-zA-Z0-9\s]+$/;
+    if(serviceRegex.test(editServiceName.value) == false) {
+      alert('Only words, numbers and whitespace allowed. Please try again.');
+      return;
+    }
+    if(editPounds.value.length < 1 || editPence.value.length != 2) {
+      alert('Incorrect price format. Please try again.');
+      return;
+    }
+    if(parseInt(editPence.value) < 0 || parseInt(editPence.value) > 99) {
+      alert('Pence must be between 0 and 99. Please try again.');
+      return;
+    }
+    if(parseInt(editServicePrice) < 500) {
+      alert('Price must be £5.00 or more. Please try again.');
+      return
+    }
+    try {
+      parseInt(editServicePrice);
+    }
+    catch {
+      alert('Price must be numeric. Please try again.');
+      return
+    }    
+    const confirmChange = confirm('This will change all your unbooked and future appointments to the newly amended name and price. Are you sure you would like to edit your service?');
+    if(confirmChange == false) {
+      return;
+    }
+    const url = '{% url "update_profile" %}';
+    const params = {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'X-CSRFToken': csrfToken.value
+      }
+    }
+    fetch(url, params)
+    .then(res => res.json())
+    .then(res => {
+      if(res.service_edited !== null) {
+        alert('Service successfully edited!');
+        window.location.reload();
+      }
+      else {
+        alert('Something went wrong. Please try again.')
+      }
+    })
+  })
+
+</script>
+{% endblock %}

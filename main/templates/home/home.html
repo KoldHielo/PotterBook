@@ -1,0 +1,1043 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>Home - PotterBook</title>
+{% if user.is_authenticated %}
+<style>
+  #welcome-user {
+    position: absolute;
+    right: 30px;
+    top: 70px;
+  }
+
+  #dashboard {
+    margin-top: 140px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    justify-items: center;
+    width: 100%;
+    gap: 50px 0;
+  }
+
+  #dashboard > div {
+    position: relative;
+    border: 2px solid white;
+    padding: 10px;
+    text-align: center;
+    min-height: 185px;
+    width: 185px;
+    display: grid;
+    align-items: space-between;
+  }
+
+  #dashboard > div > span {
+    font-size: 40px;
+    word-wrap: break-word;
+    word-break: break-all;
+  }
+
+  .arrow {
+    position: absolute;
+    align-self: center;
+    height: 20px;
+    width: 20px;
+    border: 4px solid white;
+    border-top: none;
+    border-left: none;
+    cursor: pointer;
+  }
+
+  .arrow.left {
+    left: 5px;
+    transform: rotate(135deg);
+  }
+
+  .arrow.right {
+    right: 5px;
+    transform: rotate(-45deg);
+  }
+
+  #appointment-title {
+    margin: 40px auto;
+    text-align: center;
+  }
+
+  #appointment-table {
+    margin: 50px auto 0 auto;
+    width: 95%;
+    max-width: 850px;
+    border: 2px solid white;
+    text-align: center;
+    font-size: 1.3em;
+  }
+
+  #appointment-table thead {
+    height: 30px;
+  }
+
+  #appointment-table td {
+    height: 30px;
+    padding: 5px;
+  }
+
+  #appointment-table > tbody > tr {
+    cursor: pointer;
+  }
+
+  #appointment-table > tbody > tr:hover {
+    color: green;
+  }
+
+  #filter-appointments {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    width: 95%;
+    max-width: 850px;
+    margin: 0 auto;
+  }
+
+  #filter-appointments > div {
+    display: grid;
+    justify-content: center;
+  }
+
+  #filter-appointments * {
+    text-align: center;
+  }
+
+  #filter-appointments select {
+    width: 150px;
+    height: 30px;
+    font-size: 20px;
+    border-radius: 25%;
+  }
+
+  #app-filter-submit {
+    margin: 10px auto;
+    display: block;
+  }
+
+  .popup-form {
+      position: fixed;
+      background-color: white;
+      width: 350px;
+      border: 2px solid navy;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      border-radius: 10%;
+      box-shadow: 2px 19px 31px rgba(0, 0, 0, 0.2);
+      transition: 1s;
+      opacity: 0;
+      z-index: -1;
+      color: navy;
+    }
+
+  .popup-form > h2 {
+    margin: 20px auto;
+    text-align: center;
+  }
+
+  #appointment-info {
+    margin: 0 auto 40px auto;
+    width: 90%;
+    text-align: center;
+    overflow-y: scroll;
+    height: 50vh;
+    max-height: 300px;
+  }
+
+    #form-background {
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background-color: black;
+      opacity: 0;
+      transition: 1s;
+      z-index: -1;
+    }
+  
+  .popup-cross {
+    height: 20px;
+    width: 20px;
+    position: absolute;
+    right: 25px;
+    top: 15px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+  }
+
+  .cross {
+    height: 2px;
+    width: 100%;
+    background-color: navy;
+    position: absolute;
+  }
+
+  .cross.one {
+    transform: rotate(45deg);
+  }
+  
+  .cross.two {
+    transform: rotate(-45deg);
+  }
+
+  .popup-button {
+    color: #fff;
+    width: 130px;
+    text-align: center;
+    margin: 0 auto 20px auto;
+    padding: 12.5px 35px 12.5px 25px;
+    border-radius: 100px;
+    background-color: darkred;
+    background-image: radial-gradient(93% 87% at 87% 89%, rgba(0, 0, 0, 0.23) 0%, transparent 86.18%), radial-gradient(66% 87% at 26% 20%, rgba(255, 255, 255, 0.41) 0%, rgba(255, 255, 255, 0) 69.79%, rgba(255, 255, 255, 0) 100%);
+    box-shadow: 2px 19px 31px rgba(0, 0, 0, 0.2);
+    font-weight: bold;
+    font-size: 16px;
+    user-select: none;
+    touch-action: manipulation;
+    cursor: pointer;
+  }
+
+  #appointment-info > div {
+    margin: 5px auto;
+  }
+
+  #table-pages {
+    margin: 10px auto;
+    text-align: center;  
+  }
+
+  #table-pages > span:hover {
+    color: green;
+  }
+
+  #table-pages > span {
+    cursor: pointer;
+    margin: 0 3px;
+    text-decoration: underline;
+  }
+
+  #table-pages > span:nth-of-type(3) {
+    font-size: 1.2em;
+  }
+
+  #add-appointment-div {
+    margin: 0 auto;
+    width: 95%;
+    max-width: 850px;
+    position: relative;
+  }
+
+  #add-appointment {
+    width: 25px;
+    height: 25px;
+    cursor: pointer;
+    position: absolute;
+    right: 10px;
+    display: flex;
+    align-items: center;
+  }
+
+  .add-bar {
+    position: absolute;
+    height: 2px;
+    width: 100%;
+    background-color: green;
+  }
+
+  .add-bar.two {
+    transform: rotate(90deg);
+  }
+
+  #add-appointment-info {
+    width: 80%;
+    margin: 30px auto;
+    padding: 0 20px;
+  }
+
+  #add-appointment-info > input {
+    border: 1px solid black;
+  }
+
+  #add-appointment-info > select {
+    border: 1px solid black;
+  }
+
+  #add-appointment-info > input:not(#add-year) {
+    width: 25px;
+  }
+
+  #add-year {
+    width: 50px;
+  }
+
+  #add-app-info-button {
+    background-color: green;
+  }
+</style>
+{% else %}
+<style>
+  
+  #student-learning {
+    margin: 90px auto 0 auto;
+    display: block;
+    opacity: 30%;
+    z-index: -1;
+    width: 90%;
+    border-radius: 30%;
+  }
+
+  #student-img-container {
+    width: 100%;
+    position: relative;
+  }
+
+  #student-img-container > div {
+    position: absolute;
+    display: grid;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+    align-items: space-evenly;
+    text-align: center;
+    padding: 50px;
+  }
+
+  #student-img-container h1 {
+    font-size: 6vw;
+    padding: 0 20px;
+  }
+
+  @keyframes pulsate {
+    0% {
+      transform: scale(1);
+    }
+
+    100% {
+      transform: scale(1.1);
+    }
+  }
+
+  #register-button {
+    width: 65px;
+    height: 22.75px;
+    font-size: 13px;
+    margin: 22.75px auto 0 auto;
+    cursor: pointer;
+    background-color: goldenrod;
+    color: black;
+    border-radius: 35%;
+    border: 3px solid black;
+    display: grid;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    animation: pulsate 1s linear 0s infinite alternate;
+  }
+
+  @media only screen and (min-width: 413px) {
+    #register-button {
+      width: 100px;
+      height: 35px;
+      font-size: 20px;
+      margin-top: 35px;
+    }
+  }
+
+  #register-button:hover {
+    transform: scale(1.2);
+  }
+
+  #register-button:active {
+    transform: scale(1);
+  }
+
+  hr {
+    width: 90%;
+    border-color: skyblue;
+    background-color: skyblue;
+    margin: 40px auto;
+  }
+
+  #perks-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    justify-items: center;
+    align-items: center;
+    gap: 50px;
+  }
+
+  #perks-container > img {
+    width: 50%;
+  }
+
+  #perks-container > h2 {
+    padding: 20px;
+  }
+
+  #more-info > h2 {
+    text-align: center;
+    text-decoration: underline;
+    font-size: 2rem;
+    margin-bottom: 20px;
+  }
+
+  #more-info > p {
+    margin: 10px 10%;
+  }
+
+  @media only screen and (min-width: 875px) {
+    
+    #student-img-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      margin-top: 100px;
+    }
+
+    #student-img-container > div {
+      position: static;
+      justify-self: center;
+      align-self: center;
+    }
+
+    #student-img-container h1 {
+      font-size: 3vw;
+    }
+
+    #student-learning {
+      opacity: 70%;
+      width: 75%;
+      justify-self: center;
+      transform: rotate(5deg);
+      margin-top: 0;
+    }
+
+    #perks-container > h2, #perks-container > img {
+      margin: 60px 0;
+    }
+
+    #perks-container > h2 {
+      padding: 30px;
+      font-size: 1.5rem;
+    }
+
+    #perks-container {
+      grid-template-columns: repeat(4, 1fr)
+    }
+
+    #more-info > h2 {
+      font-size: 2.5rem;
+    }
+
+    #more-info > p {
+      font-size: 1.5rem;
+    }
+
+    @media only screen and (min-width: 1100px) {
+      #perks-container > h2 {
+        padding: 42px;
+        font-size: 2rem;
+      }
+    }
+  }
+
+  .perk-img, .perk-quote {
+      opacity: 0;
+      transition: opacity 3s;
+  }
+</style>
+{% endif %}
+{% endblock %}
+
+{% block main %}
+{% if user.is_authenticated %}
+<div id="welcome-user">Welcome, {{ user.first_name }}</div>
+<section id="dashboard">
+  
+  <div id="appointment-stats">
+    <div id="appointment-left-arrow" class="arrow left"></div>
+    <h2></h2>
+    <span></span>
+    <div id="appointment-right-arrow" class="arrow right"></div>
+  </div>
+  
+  <div id="earning-stats">
+    <div id="earnings-left-arrow" class="arrow left"></div>
+    <h2></h2>
+    <span></span>
+    <div id="earnings-right-arrow" class="arrow right"></div>
+  </div>
+  
+</section>
+<h2 id="appointment-title">Bookings</h2>
+<form id="filter-appointments">
+  {% csrf_token %}
+  <div>
+    <label for="timeframe">Timeframe:</label>
+    <select id="timeframe" name="timeframe">
+      <option value="before_now">Before Now</option>
+      <option value="now_onwards" selected>Now Onwards</option>
+    </select>
+  </div>
+  
+  <div>
+  <label for="service">Service: </label>
+  <select id="service" name="service">
+    <option value="all" selected>All Services</option>
+    <option value='legacy'>Discontinued Services</option>
+    {% for s in services %}
+    <option value="{{s.service}}">{{s.service}}</option>
+    {% endfor %}
+  </select>
+  </div>
+
+  <div>
+  <label for="booked">Booking Status: </label>
+  <select id="booked" name="booked">
+    <option value="all">All</option>
+    <option value="booked" selected>Booked</option>
+    <option value="unbooked">Unbooked</option>
+  </select>
+  </div>
+
+  <div>
+  <label for="verified">Verification Status: </label>
+  <select id="verified" name="verified">
+    <option value="all" selected>All</option>
+    <option value="verified">Verified Bookings</option>
+    <option value="unverified" selected>Unverified Bookings</option>
+  </select>
+  </div>
+
+  <div>
+  <label for="timezone-filter">Timezone: </label>
+  <select id="timezone-filter" name="timezone-filter">
+    <option value="UTC" selected>UTC</option>
+    <!--Filled with JS-->
+  </select>
+  </div>
+  
+</form>
+<button id="app-filter-submit" type="button">Filter Bookings</button>
+
+<div id="add-appointment-div">
+  <div id="add-appointment">
+    <div class="add-bar one"></div>
+    <div class="add-bar two"></div>
+  </div>
+</div>
+
+<table id="appointment-table">
+  <thead>
+    <tr>
+      <th>Date</th>
+      <th>Service</th>
+      <th>Booked</th>
+      <th>Verified</th>
+    </tr>
+  </thead>
+  <tbody>
+    <!--Filled with JS-->
+  </tbody>
+</table>
+<div id="table-pages">
+  <span></span>
+  <span></span>
+  <span></span>
+  <span></span>
+  <span></span>
+</div>
+
+<div id="form-background"></div>
+<!--Appointment Form-->
+  <form id="appointment-container" class="popup-form" method="post">
+    <input type="hidden" name="readable-date">
+    {% csrf_token %}
+    <div id="appointment-form-cross" class="popup-cross">
+        <div class="cross one"></div>
+        <div class="cross two"></div>
+    </div>
+    <h2>Booking Info</h2>
+    <section id="appointment-info">
+      <!--Filled with JS-->
+    </section>
+    <div id="app-info-button" class="popup-button"></div>
+</form>
+<!--Appointment Form-->
+<form id="add-appointment-container" class="popup-form" method="post">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="MMA">
+    <div id="add-appointment-form-cross" class="popup-cross">
+        <div class="cross one"></div>
+        <div class="cross two"></div>
+    </div>
+    <h2>Add Timeslot</h2>
+    <section id="add-appointment-info">
+      <input id="add-date" name="add-date" placeholder="DD" maxlength=2 minlength=2>/<input  id="add-month" name="add-month" placeholder="MM" maxlength=2 minlength=2>/<input id="add-year" name="add-year" placeholder="YYYY" maxlength=4 minlength=4> @ <input id="add-hour" name="add-hour" maxlength=2 minlength=2>:<input id="add-minutes" name="add-minutes" maxlength=2 minlength=2> for service
+      <select id="add-app-service" name="service">
+        {% for s in services %}
+        <option value="{{s.service}}">{{s.service}}</option>
+        {% endfor %}
+      </select>
+      in timezone 
+      <select id="aa-timezone" name="aa-timezone">
+        <option value="UTC">UTC</option>
+        <!--Filled with JS-->
+      </select>
+    </section>
+    <div id="add-app-info-button" class="popup-button">Add</div>
+</form>
+
+<script>
+
+  const localTz = Intl.DateTimeFormat().resolvedOptions().timeZone
+  const timezoneFilter = document.querySelector('#timezone-filter');
+  const aaTimezoneSelect = document.querySelector('#aa-timezone');
+  Intl.supportedValuesOf('timeZone').forEach(tz => {
+      const optionTz = document.createElement('option');
+      optionTz.innerHTML = tz;
+      optionTz.value = tz;
+      const optionTzTwo = optionTz.cloneNode(true);
+      timezoneFilter.appendChild(optionTz);
+      aaTimezoneSelect.appendChild(optionTzTwo);
+      if(tz == localTz) {
+        optionTz.selected = true;
+        optionTzTwo.selected = true;
+      }
+    })
+  
+  const formatPrice = totalInPence => {
+    if(totalInPence != 'None') {
+      return `£${totalInPence.slice(0, -2)}.${totalInPence.slice(-2)}`;
+    }
+    else {
+      return '£0.00';
+    }
+  }
+
+  const inputStats = (element, statList, statType=null) => {
+    const headerNode = element.querySelector('h2');
+    const spanNode = element.querySelector('span');
+    const header = statList[0];
+    let span = statList[1];
+    if(statType == 'earnings') {
+      span = formatPrice(span);
+    }
+    headerNode.innerHTML = header;
+    spanNode.innerHTML = span;
+  }
+  
+  let appointmentCount = 2;
+  const appointmentStats = [
+    ['All Past Bookings', '{{past_appointments.booked.count}}'],
+    ['Booked Last Month', '{{past_appointments.booked_last_month.count}}'],
+    ['Booked This Month', '{{appointments.booked_this_month.count}}'],
+    ['Booked Next Month', '{{future_appointments.booked_next_month.count}}'],
+    ['All Future Bookings', '{{future_appointments.booked.count}}']
+  ]
+
+  let earningCount = 2;
+  const earningStats = [
+    ['All Past Earnings', '{{past_appointments.earnings}}'],
+    ['Earnings Last Month', '{{past_appointments.earnings_last_month}}'],
+    ['Earnings This Month', '{{appointments.earnings_this_month}}'],
+    ['Earnings Next Month', '{{future_appointments.earnings_next_month}}'],
+    ['All Future Earnings', '{{future_appointments.earnings}}']
+  ]
+
+  const appointmentStatsElement = document.querySelector('#appointment-stats');
+  const earningStatsElement = document.querySelector('#earning-stats');
+
+  inputStats(appointmentStatsElement, appointmentStats[appointmentCount]);
+  inputStats(earningStatsElement, earningStats[earningCount], 'earnings');
+  
+  const appointmentArrows = appointmentStatsElement.querySelectorAll('.arrow');
+
+  appointmentArrows[0].addEventListener('click', e => {
+    appointmentCount--;
+    if(appointmentCount < 0) {
+      appointmentCount = appointmentStats.length - 1;
+    }
+    inputStats(appointmentStatsElement, appointmentStats[appointmentCount]);
+  });
+
+  appointmentArrows[1].addEventListener('click', e => {
+    appointmentCount++;
+    if(appointmentCount >= appointmentStats.length) {
+      appointmentCount = 0
+    }
+    inputStats(appointmentStatsElement, appointmentStats[appointmentCount]);
+  })
+
+  const earningsArrows = earningStatsElement.querySelectorAll('.arrow');
+
+  earningsArrows[0].addEventListener('click', e => {
+    earningCount--;
+    if(earningCount < 0) {
+      earningCount = earningStats.length - 1;
+    }
+    inputStats(earningStatsElement, earningStats[earningCount], 'earnings');
+  });
+
+  earningsArrows[1].addEventListener('click', e => {
+    earningCount++;
+    if(earningCount >= earningStats.length) {
+      earningCount = 0
+    }
+    inputStats(earningStatsElement, earningStats[earningCount], 'earnings');
+  })
+
+  const filterAppointmentsForm = document.querySelector('#filter-appointments');
+  const appFilterSubmit = document.querySelector('#app-filter-submit');
+  const appointmentTableBody = document.querySelector('#appointment-table > tbody');
+  const appointmentContainer = document.querySelector('#appointment-container');
+  const formBackground = document.querySelector('#form-background');
+  const acCloseButton = document.querySelector('#appointment-form-cross');
+  const appInfoSection = document.querySelector('#appointment-info');
+  const appInfoButton = document.querySelector('#app-info-button');
+  const tablePageSpans = document.querySelectorAll('#table-pages > span')
+
+  appInfoButton.addEventListener('click', e => {
+    const url = '{% url "appointment_config" %}';
+    const formData = new FormData(appointmentContainer);
+    const params = {
+      method: 'POST',
+      body: formData
+    }
+    const action = appInfoSection.querySelector('[name="action"]').value;
+    if(action == 'CMS') {
+      const delete_confirm = confirm('Are you sure you would like to delete this timeslot?');
+      if(delete_confirm == true) {
+        fetch(url, params)
+        .then(res => res.json())
+        .then(res => {
+          if('warning' in res) {
+            alert(res.warning);
+            return;
+          }
+          else if('message' in res) {
+            alert(res.message);
+            window.location.reload();
+          }
+        })
+      }
+    }
+    else if(action == 'refund') {
+      const refund_confirm = prompt('Are you sure you want to refund the customer of this booking? Please type "refund" to initiate the refund');
+      if(refund_confirm == 'refund') {
+        fetch(url, params)
+        .then(res => res.json())
+        .then(res => {
+          if('warning' in res) {
+            alert(res.warning);
+            return;
+          }
+          else if('message' in res) {
+            alert(res.message);
+            window.location.reload();
+          }
+        })
+      }
+    }   
+
+  })
+
+
+  acCloseButton.addEventListener('click', async () => {
+      appointmentContainer.style.opacity = 0;
+      formBackground.style.opacity = 0;
+      await new Promise((resolve, reject) => {
+        appointmentContainer.addEventListener('transitionend', () => resolve());
+      });
+      appointmentContainer.style.zIndex = -1;
+      formBackground.style.zIndex = -1;
+      appInfoSection.innerHTML = '';
+    });
+
+  const fetchAppointments = (e=null, page=1) => {
+    const url = `/fetchappointments/${page}/`;
+    const formData = new FormData(filterAppointmentsForm);
+    const params = {
+      method: 'POST',
+      body: formData
+    }
+
+    fetch(url, params)
+    .then(res => res.json())
+    .then(res => {
+      appointmentTableBody.innerHTML = '';
+      const appointmentList = res.appointment_list
+      tablePageSpans.forEach(span => {
+        span.innerHTML = '';
+      });
+      
+      switch(res.prev_pages.length) {
+        case 2:
+          tablePageSpans[0].innerHTML = res.prev_pages[0];
+          tablePageSpans[1].innerHTML = res.prev_pages[1];
+          break;
+        case 1:
+          tablePageSpans[1].innerHTML = res.prev_pages[0];
+          break;
+      }
+      tablePageSpans[2].innerHTML = res.current_page;
+      switch(res.next_pages.length) {
+        case 2:
+          tablePageSpans[3].innerHTML = res.next_pages[0];
+          tablePageSpans[4].innerHTML = res.next_pages[1];
+          break;
+        case 1:
+          tablePageSpans[3].innerHTML = res.next_pages[0];
+          break;
+      }
+      
+      appointmentList.forEach(app => {
+        const tableRow = document.createElement('tr');
+        const date = document.createElement('td');
+        const service = document.createElement('td');
+        const booked = document.createElement('td');
+        const verified = document.createElement('td');
+        const appInfo = document.createElement('input');
+        appInfo.type = 'hidden';
+        appInfo.value = `{
+        "id": ${app.id},
+        "date": "${app.date}",
+        "name": "${app.name}",
+        "email": "${app.email}",
+        "telephone": "${app.telephone}",
+        "address": "${app.address}",
+        "note": "${app.note}",
+        "service": "${app.service}",
+        "service_price": "${app.service_price}",
+        "booked": ${app.booked},
+        "verified": ${app.verified},
+        "charge_id": "${app.charge_id}",
+        "service_booked": "${app.service_booked}",
+        "paid": "${app.paid}",
+        "refunded": ${app.refunded}
+        }`
+        date.innerHTML = app.date;
+        service.innerHTML = app.service;
+        booked.innerHTML = app.booked;
+        verified.innerHTML = app.verified;
+        const rowList = [date, service, booked, verified, appInfo];
+        rowList.forEach(tableData => {
+          tableRow.appendChild(tableData);
+        })
+        appointmentTableBody.appendChild(tableRow);
+        tableRow.addEventListener('click', e => {
+          appointmentContainer.style.zIndex = '1';
+          appointmentContainer.style.opacity = '1';
+          formBackground.style.zIndex = '1';
+          formBackground.style.opacity = '20%';
+          const appInfoRaw = tableRow.querySelector('input').value;
+          const appInfo = JSON.parse(appInfoRaw);
+          if(appInfo.booked === true) {
+            if(appInfo.refunded == true) {
+appInfoButton.style.display = 'none';
+            }
+            else {
+              appInfoButton.style.display = 'block';
+              appInfoButton.innerHTML = 'Refund';
+            }
+            appInfoSection.innerHTML = `
+            <input type="hidden" name="appointment_id" value="${appInfo.id}">
+            <input type="hidden" name="action" value="refund">
+            <div>
+              <span><b>Date: </b></span><span>${appInfo.date}</span>
+            </div>
+            <div>
+              <span><b>Booked: </b></span><span>${appInfo.booked}</span>
+            </div>
+            <div>
+              <span><b>Client Name: </b></span><span>${appInfo.name}</span>
+            </div>
+            <div>
+              <span><b>Client Email: </b></span><span>${appInfo.email}</span>
+            </div>
+            <div>
+              <span><b>Client Telephone: </b></span><span>${appInfo.telephone}</span>
+            </div>
+            <div>
+              <span><b>Client Address: </b></span><span>${appInfo.address}</span>
+            </div>
+            <div>
+              <span><b>Charge ID: </b></span><span>${appInfo.charge_id}</span>
+            </div>
+            <div>
+              <span><b>Service Booked: </b></span><span>${appInfo.service_booked}</span>
+            </div>
+            <div>
+              <span><b>Price Paid: </b></span><span>£${appInfo.paid.slice(0, -2)}.${appInfo.paid.slice(-2)}</span>
+            </div>
+            <div>
+              <span><b>Verified: </b></span><span>${appInfo.verified}</span>
+            </div>
+            <div>
+              <span><b>Refunded: </b></span><span>${appInfo.refunded}</span>
+            </div>
+            <div>
+              <span><b>Client Note: </b></span><span>${appInfo.note}</span>
+            </div>
+            `
+          }
+          else {
+            appInfoButton.style.display = 'block';
+            appInfoButton.innerHTML = 'Delete';
+            appInfoSection.innerHTML = `
+            <input type="hidden" name="appointment_id" value="${appInfo.id}">
+            <input type="hidden" name="action" value="CMS">
+            <div>
+              <span><b>Date: </b></span><span>${appInfo.date}</span>
+            </div>
+            <div>
+              <span><b>Booked: </b></span><span>${appInfo.booked}</span>
+            </div>
+            <div>
+              <span><b>Service: </b></span><span>${appInfo.service}</span>
+            </div>
+            <div>
+              <span><b>Price: </b></span><span>£${appInfo.service_price.slice(0, -2)}.${appInfo.service_price.slice(-2)}</span>
+            </div>
+            `
+          }
+        })
+      })
+    })
+  }
+
+  appFilterSubmit.addEventListener('click', fetchAppointments);
+  appFilterSubmit.click();
+  
+  tablePageSpans.forEach(span => {
+    span.addEventListener('click', e => {
+      if(e.target.innerHTML == '') {
+        return;
+      }
+      else {
+        fetchAppointments(null, e.target.innerHTML);
+      }
+    })
+  })
+
+  const addAppointment = document.querySelector('#add-appointment');
+  const addAppointmentCross = document.querySelector('#add-appointment-form-cross');
+  const addAppointmentContainer = document.querySelector('#add-appointment-container');
+  const addAppButton = document.querySelector('#add-app-info-button');
+
+  addAppButton.addEventListener('click', e => {
+    const url = '{% url "appointment_config" %}';
+    const formData = new FormData(addAppointmentContainer);
+    const params = {
+      method: 'POST',
+      body: formData
+    }
+    fetch(url, params)
+    .then(res => res.json())
+    .then(res => {
+      if('warning' in res) {
+        alert(res.warning);
+      }
+      else if('message' in res) {
+        alert(res.message);
+        window.location.reload();
+      }
+    })
+  })
+
+  addAppointment.addEventListener('click', e => {
+    addAppointmentContainer.style.zIndex = '1';
+    addAppointmentContainer.style.opacity = '1';
+    formBackground.style.zIndex = '1';
+    formBackground.style.opacity = '20%';
+  })
+
+  addAppointmentCross.addEventListener('click', async () => {
+      addAppointmentContainer.style.opacity = 0;
+      formBackground.style.opacity = 0;
+      await new Promise((resolve, reject) => {
+        addAppointmentContainer.addEventListener('transitionend', () => resolve());
+      });
+      addAppointmentContainer.style.zIndex = -1;
+      formBackground.style.zIndex = -1;
+    });
+
+  
+  
+</script>
+{% else %}
+  <div id="student-img-container">
+    <img id="student-learning" src="https://cdn.pixabay.com/photo/2014/02/24/18/31/meeting-273857_1280.jpg" alt="Student Learning With Pottermouth" />
+    <div>
+      <h1>Scheduling and booking for your business made easy!</h1>
+      <a href="/register">
+        <div id="register-button">Register</div>
+      </a>
+    </div>
+  </div>
+
+  <hr>
+
+  <section id="perks-container">
+    <img class="perk-img" src="https://cdn-icons-png.flaticon.com/512/3652/3652191.png" alt="Calendar Icon" />
+    <h2 class="perk-quote">Input your availability on your schedule</h2>
+    <h2 class="perk-quote">Share your schedule page with your clients</h2>
+    <img class="perk-img" src="https://cdn-icons-png.flaticon.com/512/3201/3201521.png" alt="Clients Icon" />
+    <img class="perk-img" src="https://cdn-icons-png.flaticon.com/512/6893/6893204.png" alt="Choose Icon" />
+    <h2 class="perk-quote">Allow your clients to book with you and checkout</h2>
+    <h2 class="perk-quote">Get paid straight into your Stripe account!</h2>
+    <img class="perk-img" src="https://cdn-icons-png.flaticon.com/512/2704/2704332.png" alt="Convert Points Icon" />
+  </section>
+
+<hr>
+
+<section id="more-info">
+  <h2>Our Goal</h2>
+  <p>Quite frankly, our goal is to be as simple as possible and facilitate the process of booking for you and your clients.</p>
+  <p>Making a schedule for your clients to book with you online is as simple as a few clicks. Long gone are the days where you need to stop everything you're doing to take a phone call and write down every booking on your calendar. With PotterBook, you can simply share your unique link/QR code with your clients where they can book with you through our simple select and check-out process.</p>
+  <p>Your bookings are easily accessible and organised on your homepage, making your schedule nice and clear to prepare you for the days ahead. You may also verify your client's bookings by scanning their QR Code ticket upon attending their booking with you so you can be sure that they are the ones who've made the booking.</p>
+  <p>Not sold yet? Well, registering with us is completely free and our pricing structure is just as simple as our website. For every booking made, we simply take a 10% fee from the booking. No ties, no recurring fees, just peace of mind. So why not go ahead and give us a try!</p>
+</section>
+  
+  <script type="text/javascript">
+    {%if user.is_authenticated %}
+    console.log('{{user.username}}')
+    {% endif %}
+    
+    let perkImages = document.getElementsByClassName('perk-img');
+    let perkQuotes = document.getElementsByClassName('perk-quote');
+
+    var scroll = window.pageYOffset + window.innerHeight
+
+    window.addEventListener('scroll', () => {
+      scroll = window.pageYOffset + window.innerHeight;
+      for(i of perkImages) {
+      if(scroll >= i.offsetTop) {
+        i.style.opacity = 1;
+      }
+    }
+      for(i of perkQuotes) {
+      if(scroll >= i.offsetTop) {
+        i.style.opacity = 1;
+      }
+    }
+    })
+
+    for(i of perkImages) {
+      if(scroll >= i.offsetTop) {
+        i.style.opacity = 1;
+      }
+    }
+      for(i of perkQuotes) {
+      if(scroll >= i.offsetTop) {
+        i.style.opacity = 1;
+      }
+    }
+  </script>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,241 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>{{business_name}} Payment Page - PotterBook</title>
+<style>
+    :root {
+        --form-width: 300px;
+    }
+    
+    h1 {
+        text-align: center;
+        margin: 70px auto 0 auto;
+        color: navy;
+    }
+
+    #timezone {
+      margin: 5px auto 45px auto;
+      text-align: center;
+      display: block;
+    }
+    
+    h2 {
+        text-align: center;
+        font-size: 15px;
+        width: var(--form-width);
+        margin: 0 auto 5px auto;
+    }
+    
+    form {
+        border: 3px solid navy;
+        width: var(--form-width);
+        margin: 0 auto;
+    }
+    
+    input, #terms, select, textarea, #card-elements {
+        text-align: center;
+        width: 80%;
+        display: block;
+        margin: 20px auto;
+        border: 1px solid black;
+    }
+
+    [name="note"] {
+      height: 125px;
+    }
+
+    #card-elements {
+      padding: 2px 0;
+      background-color: white;
+    }
+    
+    hr {
+        border-color: navy;
+        width: 70%;
+        margin: 0 auto;
+    }
+    
+    #total-payable {
+        margin: 0 auto 20px auto;
+        text-align: center;
+        font-weight: bold;
+    }
+    
+    button {
+        margin: 20px auto;
+        display: block;
+    }
+
+  #terms {
+    font-size: 13px;
+    border: none;
+  }
+
+  #terms a {
+    color: lightgreen;
+    text-decoration: underline;
+  }
+
+  #terms > * {
+    margin: 4px auto;
+    text-align: center;
+  }
+
+  
+        </style>
+{% endblock %}
+
+{% block main %}
+<h1>{{ date }}</h1>
+<span id="timezone"><b style="color: lightgreen;">Timezone:</b> {{ timezone }}</span>
+        <h2>Please fill out the following details to book your place:</h2>
+        <form action="{% url 'handle_payment' business_slug %}" method="post" id="payment-form" onsubmit="handleForm(event)">
+          {% csrf_token %}
+            <input type="hidden" name="timezone" value="{{timezone}}" required>
+            <input type="hidden" name="iso-appointment" value="{{iso}}" required>
+            <input type="hidden" name="readable-date" value="{{date}}" required>
+            <input type="text" name="client-name" placeholder="Full Name" required>
+            <input type="email" name="client-email" placeholder="Email" required>
+            <input type="text" name="telephone" placeholder="Phone Number" maxlength="50" required>
+            {% if all_services %}
+            <select id="service" name="service" required>
+                <option selected disabled hidden>Choose a service...</option>
+                {% for service in all_services %}
+                <option value='{"service": "{{service.service}}", "price": "{{service.price}}"}'>{{service.service}}</option>
+                {% endfor %}
+            </select>
+            {% elif service %}
+            <label for="service" style="text-align: center; margin: 20px auto; display: block;"><b>Service:</b> {{service.service}}</label>
+            <input id="service" type="hidden" name="service" value='{"service": "{{service.service}}", "price": "{{service.price}}"}'>
+            {% endif %}
+            
+            <hr>
+            <input class="address" name="address-line-1" placeholder="Address Line One">
+            <input class="address" name="address-line-2" placeholder="Address Line Two">
+            <input class="address" name="city" placeholder="City">
+            <input class="address" name="county" placeholder="County">
+            <input class="address" name="post-code" placeholder="Post Code">
+            <hr>
+            <textarea name="note" placeholder="Leave a note (optional)"></textarea>
+            <hr>
+            <div id="card-elements">
+              <!--Filled with Stripe payment form-->
+            </div>
+            <div id="total-payable">Total:</div>
+          
+          <label id="terms">
+    <span>
+      Please check the box below to confirm that you have read and accepted our <a href="{% url 'terms_and_conditions' %}" target="_blank">Terms and Conditions</a> and <a href="{% url 'privacy_policy' %}" target="_blank">Privacy Policy</a>
+    </span>
+    <input type="checkbox" name="client_accepts" value="accepted" required></label>
+          
+            <button>Submit</button>
+        </form>
+
+        {% if service %}
+        <script>
+          const totalPayable = document.querySelector('#total-payable');
+          const serviceInput = JSON.parse(document.querySelector('#service').value);
+          const priceFormatted = `£${serviceInput.price.slice(0, -2)}.${serviceInput.price.slice(-2)}`;
+          const serviceLabel = document.querySelector('label[for="service"]');
+          serviceLabel.innerHTML = `<b>Service: </b>${serviceInput.service} @ ${priceFormatted}`;
+          totalPayable.innerHTML = `Total: ${priceFormatted}`;
+        </script>
+        {% elif all_services %}
+          <script>
+            const totalPayable = document.querySelector('#total-payable');
+            const serviceSelect = document.querySelector('#service');
+            serviceSelect.querySelectorAll('option:not(:first-of-type)').forEach(option => {
+              const serviceInput = JSON.parse(option.value);
+              const priceFormatted = `£${serviceInput.price.slice(0, -2)}.${serviceInput.price.slice(-2)}`;
+              option.innerHTML = `${serviceInput.service} @ ${priceFormatted}`;
+            })
+            serviceSelect.addEventListener('change', e => {
+                serviceJson = JSON.parse(serviceSelect.value);
+                const priceFormatted = `£${serviceJson.price.slice(0, -2)}.${serviceJson.price.slice(-2)}`;
+                totalPayable.innerHTML = `Total: ${priceFormatted}`;
+              })
+          </script>
+        {% endif %}
+
+        <script>
+          var bookingForm = document.querySelector('#payment-form');
+          var stripe = Stripe('pk_test_51N3oMqBE8C1arWo9GaLhmPNPNZAPybRdGmlmiQSPtNXHrRILVANTXkw8ASHIopoVJK0vICaU7c5tpZ9ujdPnE9z500U16NutO7', {
+            stripeAccount: '{{stripe_id}}'
+          });
+          var elements = stripe.elements();
+
+          var card = elements.create('card');
+          card.mount('#card-elements');
+          //Stripe Charge API
+          /*function handleForm(event) {
+            event.preventDefault();
+            stripe.createToken(card)
+              .then(res => {
+                if(res.error) {
+                  alert(res.error.message);
+                }
+                else {
+                  let stripeToken = document.createElement('input');
+                  stripeToken.type = 'hidden';
+                  stripeToken.name = 'stripe-token';
+                  stripeToken.value = res.token.id;
+                  bookingForm.appendChild(stripeToken);
+                  bookingForm.submit();
+                }
+              });
+          }*/
+
+          //Stripe PaymentIntent API
+          const handleForm = async event => {
+            event.preventDefault();
+            const url = '{% url "create_payment_intent" business_slug %}';
+            const csrfToken = document.querySelector('[name="csrfmiddlewaretoken"]');
+            const service = JSON.parse(document.querySelector('#service').value);
+            let formData = new FormData();
+            formData.append('service', service.service);
+            formData.append('iso', '{{iso}}');
+            formData.append('price', parseInt(service.price));
+            const params = {
+              method: 'POST',
+              body: formData,
+              headers: {
+                'X-CSRFToken': csrfToken.value
+              }
+            }
+            let clientSecret = null;
+            let intentID = null;
+            
+            const intentRequest = await fetch(url, params);
+            const intentResponse = await intentRequest.json();
+            if('warning' in intentResponse) {
+              alert(intentResponse.warning);
+              return;
+            }
+            else {
+              clientSecret = intentResponse.client_secret;
+              intentID = intentResponse.intent_id;
+            }
+            
+            stripe.confirmCardPayment(clientSecret, {
+              payment_method: {
+                card: card
+              }
+            })
+            .then(result => {
+              if(result.error) {
+                alert(result.error.message);
+              }
+              else {
+                const intentInput = document.createElement('input');
+                intentInput.name = 'intent_id';
+                intentInput.value = intentID;
+                intentInput.type = 'hidden';
+                bookingForm.appendChild(intentInput);
+                bookingForm.submit();
+              }
+            })
+            .catch(error => alert(error));
+          }
+        </script>
+{% endblock %}

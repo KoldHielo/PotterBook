@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>Contact Page - PotterBook</title>
+<style>
+  h1 {
+    margin: 80px auto 40px auto;
+    text-align: center;
+  }
+
+  #me-photo {
+    display: block;
+    margin: 0 auto;
+    width: 150px;
+  }
+
+  #me-name, #me-title {
+    margin: 0 auto;
+    text-align: center;
+    font-family: 'Edu TAS Beginner', 'Karla', monospace;
+  }
+
+  #me-name {
+    font-size: 25px;
+  }
+
+  #info {
+    margin: 50px auto 30px auto;
+    width: 350px;
+  }
+
+  #info p {
+    margin: 10px auto;
+  }
+
+  #email-me {
+    text-decoration: underline;
+    font-weight: bold;
+    color: lightgreen;
+    font-size: 20px;
+  }
+  
+</style>
+{% endblock %}
+
+{% block main %}
+<h1>Contact me!</h1>
+<img id="me-photo" src="https://calendar-app.team-oldfield.repl.co/media/businesses/1/Clipped_image_20230709_074559.png" alt="Image of Kieran Oldfield">
+<div id="me-name">Kieran Oldfield</div>
+<div id="me-title">Developer</div>
+<section id="info">
+  <p>If you have any questions, problems or even feedback (criticism is absolutely welcome!), go ahead and send me an email by clicking <a id="email-me" href="mailto: development@kieranoldfield.co.uk">here</a>.</p>
+  <p>Alternatively, you can visit my personal website located in the footer and navigate to my contact page where you may then fill out a form!</p>
+</section>
+
+{% endblock %}

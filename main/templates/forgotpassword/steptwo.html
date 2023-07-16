@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<style>
+  h1 {
+    margin: 80px auto 0 auto;
+    text-align: center;
+  }
+
+  form {
+    margin: 70px auto 50px auto;
+    width: 400px;
+  }
+
+  form > * {
+    display: block;
+  }
+
+  form > div {
+    margin: 10px auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    justify-content: space-evenly;
+    padding: 0 50px;
+    align-items: center;
+  }
+
+  input {
+    width: 220px;
+    height: 20px;
+  }
+
+  button {
+    margin: 10px auto 0 auto;
+  }
+
+  #pass-instructions {
+    display: block;
+    font-size: 13px;
+    width: 400px;
+    margin: 0 auto;
+    text-align: center;
+  }
+</style>
+{% endblock %}
+
+{% block main %}
+<h1>Reset Your Password</h1>
+<form action="{% url 'reset_password' code %}" method="post">
+  {% csrf_token %}
+  <div>
+    <label>Email: </label>
+    <div>{{business.user.email}}</div>
+  </div>
+  <div>
+    <label for="password">Password: </label>
+    <input id="password" type="password" name="password">
+  </div>
+  <div>
+    <label for="confirm-password">Confirm Password: </label>
+    <input id="confirm-password" type="password" name="confirm-password">
+  </div>
+  <button>Submit</button>
+</form>
+<span id="pass-instructions">Password must be 8+ characters, contain a capital letter, lowercase letter and a special character.</span>
+<script>
+  const passForm = document.querySelector('form');
+  passForm.addEventListener('submit', e => {
+    e.preventDefault();
+    fetch(passForm.action, {
+      method: 'POST',
+      body: new FormData(passForm)
+    })
+    .then(res => res.json())
+    .then(res => {
+      switch(res.changed) {
+        case true:
+          alert('Password has been successfully changed!');
+          window.location.href = '{% url "login" %}';
+          break;
+        case false:
+          alert('Invalid form data. Please try again.');
+          break;
+      }
+    })
+  })
+</script>
+{% endblock %}
