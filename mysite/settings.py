@@ -156,8 +156,9 @@ EMAIL_HOST_PASSWORD = os.environ['EMAIL_HOST_PASSWORD']
 EMAIL_USE_SSL = True
 DEFAULT_FROM_EMAIL = os.environ['EMAIL_HOST_USER']
 
-# Configure Google Cloud Storage as the storage backend
-STORAGES = {"default": {"BACKEND": "storages.backends.s3boto3.S3Boto3Storage"}}
+# Configure AWS Storage as the storage backend
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+#STORAGES = {"default": {"BACKEND": "storages.backends.s3boto3.S3Boto3Storage"}}
 AWS_ACCESS_KEY_ID = os.environ['AWS_ACCESS_KEY_ID']
 AWS_SECRET_ACCESS_KEY = os.environ['AWS_SECRET_ACCESS_KEY']
 AWS_STORAGE_BUCKET_NAME = os.environ['AWS_STORAGE_BUCKET_NAME']
