@@ -161,4 +161,4 @@ DEFAULT_FROM_EMAIL = os.environ['EMAIL_HOST_USER']
 DEFAULT_FILE_STORAGE = 'storages.backends.gcloud.GoogleCloudStorage'
 GS_BUCKET_NAME = 'potterbook'
 GS_PROJECT_ID = os.environ['GS_PROJECT_ID']
-GOOGLE_APPLICATION_CREDENTIALS = '/credentials.json'
+GS_CREDENTIALS = '/credentials.json'
