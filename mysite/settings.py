@@ -157,7 +157,8 @@ EMAIL_USE_SSL = True
 DEFAULT_FROM_EMAIL = os.environ['EMAIL_HOST_USER']
 
 # Configure Google Cloud Storage as the storage backend
-STORAGES = {"default": {"BACKEND": "storages.backends.gcloud.GoogleCloudStorage"}}
-GS_BUCKET_NAME = 'potterbook'
-GS_PROJECT_ID = os.environ['GS_PROJECT_ID']
-GOOGLE_APPLICATION_CREDENTIALS = '/credentials.json'
+STORAGES = {"default": {"BACKEND": "storages.backends.s3boto3.S3Boto3Storage"}}
+AWS_ACCESS_KEY_ID = os.environ['AWS_ACCESS_KEY_ID']
+AWS_SECRET_ACCESS_KEY = os.environ['AWS_SECRET_ACCESS_KEY']
+AWS_STORAGE_BUCKET_NAME = os.environ['AWS_STORAGE_BUCKET_NAME']
+
