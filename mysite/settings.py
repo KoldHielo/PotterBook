@@ -35,6 +35,7 @@ ALLOWED_HOSTS = ["*"]
 # Application definition
 
 INSTALLED_APPS = [
+    'storages',
     'main',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -152,3 +153,9 @@ EMAIL_HOST_USER = os.environ['EMAIL_HOST_USER']
 EMAIL_HOST_PASSWORD = os.environ['EMAIL_HOST_PASSWORD']
 EMAIL_USE_SSL = True
 DEFAULT_FROM_EMAIL = os.environ['EMAIL_HOST_USER']
+
+# Configure Google Cloud Storage as the storage backend
+DEFAULT_FILE_STORAGE = 'storages.backends.gcloud.GoogleCloudStorage'
+GS_BUCKET_NAME = 'potterbook'
+GS_PROJECT_ID = os.environ['GS_PROJECT_ID']
+GS_CREDENTIALS = os.environ['GOOGLE_ACCOUNT_CREDENTIALS']
