@@ -21,8 +21,6 @@ from django.db.models import Model, Sum
 import secrets
 from django.core.paginator import Paginator
 from hashlib import sha256
-from functools import reduce
-import operator
 import pytz
 
 
