@@ -634,7 +634,7 @@ def register(request):
       subject=subject,
       message=message,
       html_message=html_message,
-      from_email=None,
+      from_email='info@potterbook.co',
       recipient_list=[email]
     )
     login_user = authenticate(username=email, password=password)
@@ -1095,11 +1095,11 @@ def handle_payment(request, slug):
             tz_string=tz_string,
             verify_url=verification_url
           )
-          send_mail(email_subject, email_message, os.environ['EMAIL_HOST_USER'], [client_email], html_message=html_message)
+          send_mail(email_subject, email_message, 'info@potterbook.co', [client_email], html_message=html_message)
           send_mail(
             f'New Booking: {client_name}',
             f'Customer Name: {client_name}\nEmail: {client_email}\nBooked For: {business_readable_date} - {business_tz} Timezone\nService Required: {service.service}\nPayment Ref: {app.charge_id}\n',
-            os.environ['EMAIL_HOST_USER'],
+            'info@potterbook.co',
             [business.user.email]
           )
           context = {
@@ -1457,7 +1457,7 @@ def forgot_password(request):
     mail_status = send_mail(
       subject=subject,
       message=message,
-      from_email=os.environ['EMAIL_HOST_USER'],
+      from_email='info@potterbook.co',
       recipient_list=[user.email],
     )
     return JsonResponse({'processed': True})
