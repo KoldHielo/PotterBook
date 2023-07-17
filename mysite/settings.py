@@ -157,14 +157,8 @@ EMAIL_USE_SSL = True
 DEFAULT_FROM_EMAIL = os.environ['EMAIL_HOST_USER']
 
 # Configure Google Cloud Storage as the storage backend
-with tempfile.NamedTemporaryFile(mode='w', delete=False) as temp_file:
-    data = json.loads(os.environ['GOOGLE_APPLICATION_CREDENTIALS'])
-    json.dump(data, temp_file)
-    GAC_path = temp_file.name
-
 
 DEFAULT_FILE_STORAGE = 'storages.backends.gcloud.GoogleCloudStorage'
 GS_BUCKET_NAME = 'potterbook'
 GS_PROJECT_ID = os.environ['GS_PROJECT_ID']
-GOOGLE_APPLICATION_CREDENTIALS = GAC_path
-
+GOOGLE_APPLICATION_CREDENTIALS = '/credentials.json'
