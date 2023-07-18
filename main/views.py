@@ -214,7 +214,7 @@ def update_profile(request):
         user_profile.business_name = business_name
         slug = generate_unique_slug(CustomBusinessUser, user_profile, user_profile.business_name, 'business_slug')
         user_profile.business_slug = slug
-        qr_img = generate_qr_code(request.build_absolute_uri(f'https://{slug}.potterbook.co/', f'{slug}-qr', 'png')
+        qr_img = generate_qr_code(f'https://{slug}.potterbook.co/', f'{slug}-qr', 'png')
         user_profile.qr_code.delete()
         user_profile.qr_code = qr_img
         user_profile.save()
