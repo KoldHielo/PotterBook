@@ -17,7 +17,7 @@ urlpatterns = [
   re_path(r'^static/(?P<path>.*)$', serve, {'document_root': settings.STATIC_ROOT}),
   path('editavailability/', views.edit_availability, name='edit_availability'),
   path('retreiveappointments/<str:slug>/', views.retreive_dates, name='retreive_dates'),
-  path('business/<str:slug>/', views.business_schedule, name='business_schedule'),
+  #path('business/<str:slug>/', views.business_schedule, name='business_schedule'),
   path('bookslot/<str:slug>/', views.book_slot, name='book_slot'),
   path('handlepayment/<str:slug>/', views.handle_payment, name='handle_payment'),
   path('appointmentavailable/<str:slug>/', views.appointment_available, name='appointment_available'),
