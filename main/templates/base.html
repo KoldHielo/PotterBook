@@ -197,54 +197,54 @@
         <div id="bar-three" class="bar"></div>
       </div>
       <div id="menu-fullscreen">
-        <a href="{% url 'home' %}">
+        <a href="https://potterbook.co/">
         <div>Home</div>
       </a>
-      <a href="{% url 'pricing_page'%}">
+      <a href="https://potterbook.co/pricing/">
         <div>Pricing</div>
       </a>
-      <a href="{% url 'contact_page' %}">
+      <a href="https://potterbook.co/contact/">
         <div>Contact</div>
       </a>
       {% if user.is_authenticated == False %}
-      <a href="{% url 'register' %}">
+      <a href="https://potterbook.co/register/">
         <div>Register</div>
       </a>
-      <a href="{% url 'login' %}">
+      <a href="https://potterbook.co/login/">
         <div>Login</div>
       </a>
       {% elif user.is_authenticated %}
-      <a href="{% url 'profile' %}">
+      <a href="https://www.potterbook.co/profile/">
         <div>Profile</div>
       </a>
-      <a href="{% url 'logout' %}">
+      <a href="https://potterbook.co/logout/">
         <div>Logout</div>
       </a>
       {% endif %}
       </div>
     </nav>
     <section id="menu" class="menu-hidden">
-      <a href="{% url 'home' %}">
+      <a href="https://potterbook.co/">
         <div>Home</div>
       </a>
-      <a href="{% url 'pricing_page'%}">
+      <a href="https://potterbook.co/pricing/">
         <div>Pricing</div>
       </a>
-      <a href="{% url 'contact_page' %}">
+      <a href="https://potterbook.co/contact/">
         <div>Contact</div>
       </a>
       {% if user.is_authenticated == False %}
-      <a href="{% url 'register' %}">
+      <a href="https://potterbook.co/register/">
         <div>Register</div>
       </a>
-      <a href="{% url 'login' %}">
+      <a href="https://potterbook.co/login/">
         <div>Login</div>
       </a>
       {% elif user.is_authenticated %}
-     <a href="{% url 'profile' %}">
+     <a href="https://potterbook.co/profile/">
         <div>Profile</div>
       </a> 
-      <a href="{% url 'logout' %}">
+      <a href="https://potterbook.co/logout/">
         <div>Logout</div>
       </a>
       {% endif %}
