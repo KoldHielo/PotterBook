@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from django.http import JsonResponse
+from django.http import JsonResponse, Http404
 from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.contrib import messages
 from django.core.mail import send_mail
@@ -26,6 +26,7 @@ import pytz
 
 company = 'PotterBook'
 stripe.api_key = os.environ['STRIPE_SK']
+reg_subdoms = {'www', 'potterbook'}
 
 def convert_tz(dtObj, tz_string):
   tz = pytz.timezone(tz_string)
@@ -136,6 +137,9 @@ def appointment_available(request, slug):
 
 #Stripe Connect & Disconnect
 def profile(request):
+  subdomain = request.META['HTTP_HOST'].split('.')[0]
+  if subdomain not in reg_subdoms:
+    raise Http404('Invalid subdomain for this view.')
   if request.user.is_authenticated is False:
     warning = 'You must be logged in to access this page'
     return render(request, 'home/home.html', {'warning': warning})
@@ -162,6 +166,9 @@ def profile(request):
   return render(request, 'profile/profile.html', context=context)
 
 def update_profile(request):
+  subdomain = request.META['HTTP_HOST'].split('.')[0]
+  if subdomain not in reg_subdoms:
+    raise Http404('Invalid subdomain for this view.')
   if request.user.is_authenticated:
     if request.method == 'POST' and validate_post_data(request.POST):
       updated = {
@@ -207,13 +214,13 @@ def update_profile(request):
         user_profile.business_name = business_name
         slug = generate_unique_slug(CustomBusinessUser, user_profile, user_profile.business_name, 'business_slug')
         user_profile.business_slug = slug
-        qr_img = generate_qr_code(request.build_absolute_uri(reverse('business_schedule', args=[slug])), f'{slug}-qr', 'png')
+        qr_img = generate_qr_code(request.build_absolute_uri(f'https://{slug}.potterbook.co/', f'{slug}-qr', 'png')
         user_profile.qr_code.delete()
         user_profile.qr_code = qr_img
         user_profile.save()
         updated['business_name'] = user_profile.business_name
         updated['business_qr'] = user_profile.qr_code.url
-        updated['business_url'] = reverse('business_schedule', args=[user_profile.business_slug])
+        updated['business_url'] = f'https://{user_profile.business_slug}.potterbook.co/'
       except:
         pass
 
@@ -309,6 +316,9 @@ def update_profile(request):
       return JsonResponse(updated)
 
 def connect(request):
+  subdomain = request.META['HTTP_HOST'].split('.')[0]
+  if subdomain not in reg_subdoms:
+    raise Http404('Invalid subdomain for this view.')
   if request.user.is_authenticated:
     user_profile = CustomBusinessUser.objects.get(user=request.user)
     code = request.GET.get('code')
@@ -321,6 +331,9 @@ def connect(request):
     return redirect('profile')
 
 def disconnect(request):
+  subdomain = request.META['HTTP_HOST'].split('.')[0]
+  if subdomain not in reg_subdoms:
+    raise Http404('Invalid subdomain for this view.')
   if request.user.is_authenticated:
     try:
       user_profile = CustomBusinessUser.objects.get(user=request.user)
@@ -338,8 +351,36 @@ def disconnect(request):
       
 # Create your views here.
 def home(request):
-  context = None
-  if request.user.is_authenticated:
+  subdomain = request.META['HTTP_HOST'].split('.')[0]
+  if subdomain not in reg_subdoms:
+    try:
+      subdomain = request.META['HTTP_HOST'].split('.')[0]
+      business = CustomBusinessUser.objects.get(business_slug=subdomain)
+    except:
+      warning = f'Business with slug name "{subdomain}" does not exist.'
+      return render(request, 'home/home.html', {'warning': warning})
+
+    stripe_user = get_stripe_user(business.user)
+    context = {
+      'business_name': business.business_name,
+      'business_slug': slug,
+      'business_photo': business.photo.url if bool(business.photo) else False,
+      'business_bio': business.business_bio if business.business_bio is not None else False,
+      'stripe_enabled': bool(stripe_user),
+      'business_services': Service.objects.filter(business=business.user)
+    }
+    if stripe_user is None:
+      if business.business_name[-1] == 's':
+        possesive_apostrophe = "'"
+      else:
+        possesive_apostrophe = "'s"
+      context['warning'] = f'{business.business_name}{possesive_apostrophe} schedule is not available at the moment. Please check back soon!'
+      return render(request, 'business_schedule.html', context)
+    else: 
+      return render(request, 'business_schedule.html', context)
+      
+  elif subdomain in reg_subdoms and request.user.is_authenticated:
+    context = None
     now = timezone.make_aware(datetime.utcnow())
     
     last_month = now.month - 1
@@ -478,6 +519,9 @@ def home(request):
   return render(request, 'home/home.html', context)
 
 def login_page(request):
+  subdomain = request.META['HTTP_HOST'].split('.')[0]
+  if subdomain not in reg_subdoms:
+    raise Http404('Invalid subdomain for this view.')
   if request.user.is_authenticated is False:
     if request.method == 'POST':
       username = request.POST['username']
@@ -507,6 +551,9 @@ def login_page(request):
     return redirect('home')
 
 def logout_click(request):
+  subdomain = request.META['HTTP_HOST'].split('.')[0]
+  if subdomain not in reg_subdoms:
+    raise Http404('Invalid subdomain for this view.')
   if request.user.is_authenticated:
     logout(request)
   else:
@@ -517,6 +564,9 @@ def logout_click(request):
   return redirect('home')
 
 def register(request):
+  subdomain = request.META['HTTP_HOST'].split('.')[0]
+  if subdomain not in reg_subdoms:
+    raise Http404('Invalid subdomain for this view.')
   if request.user.is_authenticated:
     context = {
       'replace_state': reverse('home'),
@@ -583,7 +633,7 @@ def register(request):
     )
     slug = generate_unique_slug(CustomBusinessUser, user_profile, user_profile.business_name, 'business_slug')
     user_profile.business_slug = slug
-    qr_img = generate_qr_code(request.build_absolute_uri(reverse('business_schedule', args=[slug])), f'{slug}-qr', 'png')
+    qr_img = generate_qr_code(f'https://{slug}.potterbook.co/', f'{slug}-qr', 'png')
     user_profile.qr_code = qr_img
     user_profile.save()
     #Email welcome message to user and confirmation link
@@ -671,6 +721,9 @@ def register(request):
 
 #Calendar
 def edit_availability(request):
+  subdomain = request.META['HTTP_HOST'].split('.')[0]
+  if subdomain not in reg_subdoms:
+    raise Http404('Invalid subdomain for this view.')
   if request.user.is_authenticated is False:
     warning = 'You must be logged in to access this page'
     return JsonResponse({'warning': warning})
@@ -1168,12 +1221,13 @@ def handle_payment(request, slug):
         'replace_state': reverse('business_schedule', args=[slug])
       }
       return render(request, 'business_schedule.html', context)
-
+'''
 def business_schedule(request, slug):
   try:
-    business = CustomBusinessUser.objects.get(business_slug=slug)
+    subdomain = request.META['HTTP_HOST'].split('.')[0]
+    business = CustomBusinessUser.objects.get(business_slug=subdomain)
   except:
-    warning = f'Business with slug name "{slug}" does not exist.'
+    warning = f'Business with slug name "{subdomain}" does not exist.'
     return render(request, 'home/home.html', {'warning': warning})
 
   stripe_user = get_stripe_user(business.user)
@@ -1194,8 +1248,12 @@ def business_schedule(request, slug):
     return render(request, 'business_schedule.html', context)
   else: 
     return render(request, 'business_schedule.html', context)
+'''
 
 def verify_appointment(request, code):
+  subdomain = request.META['HTTP_HOST'].split('.')[0]
+  if subdomain not in reg_subdoms:
+    raise Http404('Invalid subdomain for this view.')
   if request.user.is_authenticated:
     try:
       hash = hash_value(code)
@@ -1219,6 +1277,9 @@ def verify_appointment(request, code):
     return render(request, 'home/home.html', {'warning': warning})
 
 def fetch_appointments(request, page):
+  subdomain = request.META['HTTP_HOST'].split('.')[0]
+  if subdomain not in reg_subdoms:
+    raise Http404('Invalid subdomain for this view.')
   try:
     tz_string = request.POST['timezone-filter']
     current_time = datetime.now(pytz.timezone(tz_string))
@@ -1327,6 +1388,9 @@ def fetch_appointments(request, page):
 
 #Continue
 def appointment_config(request):
+  subdomain = request.META['HTTP_HOST'].split('.')[0]
+  if subdomain not in reg_subdoms:
+    raise Http404('Invalid subdomain for this view.')
   if request.user.is_authenticated == False:
     warning = 'User must be logged in to access this view'
     return JsonResponse({'warning': warning})
@@ -1408,12 +1472,21 @@ def appointment_config(request):
       return JsonResponse({'warning': warning})
 
 def pricing_page(request):
+  subdomain = request.META['HTTP_HOST'].split('.')[0]
+  if subdomain not in reg_subdoms:
+    raise Http404('Invalid subdomain for this view.')
   return render(request, 'pricing.html')
 
 def contact_page(request):
+  subdomain = request.META['HTTP_HOST'].split('.')[0]
+  if subdomain not in reg_subdoms:
+    raise Http404('Invalid subdomain for this view.')
   return render(request, 'contact.html')
 
 def forgot_password(request):
+  subdomain = request.META['HTTP_HOST'].split('.')[0]
+  if subdomain not in reg_subdoms:
+    raise Http404('Invalid subdomain for this view.')
   if request.method == 'POST':
     try:
       email = request.POST['email']
@@ -1465,6 +1538,9 @@ def forgot_password(request):
     return render(request, 'forgotpassword/stepone.html')
 
 def reset_password(request, code):
+  subdomain = request.META['HTTP_HOST'].split('.')[0]
+  if subdomain not in reg_subdoms:
+    raise Http404('Invalid subdomain for this view.')
   if request.method == 'POST' and request.user.is_authenticated == False:
     try:
       hash = hash_value(code)
@@ -1500,7 +1576,13 @@ def reset_password(request, code):
     return render(request, 'home/home.html', {'warning': warning, 'replace_state': '/'})
 
 def terms_and_conditions(request):
+  subdomain = request.META['HTTP_HOST'].split('.')[0]
+  if subdomain not in reg_subdoms:
+    raise Http404('Invalid subdomain for this view.')
   return render(request, 'terms_and_conditions.html')
 
 def privacy_policy(request):
+  subdomain = request.META['HTTP_HOST'].split('.')[0]
+  if subdomain not in reg_subdoms:
+    raise Http404('Invalid subdomain for this view.')
   return render(request, 'privacy_policy.html')
