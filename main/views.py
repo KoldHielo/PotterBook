@@ -142,7 +142,10 @@ def profile(request):
     raise Http404('Invalid subdomain for this view.')
   if request.user.is_authenticated is False:
     warning = 'You must be logged in to access this page'
-    return render(request, 'home/home.html', {'warning': warning})
+    context = {'warning': warning}
+    if subdomain == 'www':
+      context['is_www'] = True
+    return render(request, 'home/home.html', context)
   user_profile = CustomBusinessUser.objects.get(user=request.user)
   services = Service.objects.filter(business=request.user)
   stripe_user = get_stripe_user(request.user)
