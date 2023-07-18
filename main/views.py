@@ -705,7 +705,7 @@ def register(request):
         'business_bio_length': user_profile._meta.get_field('business_bio').max_length,
         'business_slug': user_profile.business_slug,
         'business_qr': user_profile.qr_code.url if bool(user_profile.qr_code) else False,
-        'business_url': reverse('business_schedule', args=[user_profile.business_slug]),
+        'business_url': f'https://{user_profile.business_slug}.potterbook.co/',
         'message': 'You have successfully created an account! Please update your profile to get the best experience',
         'replace_state': reverse('profile'),
         'pref_tz': timezone
