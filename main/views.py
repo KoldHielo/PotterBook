@@ -354,12 +354,11 @@ def home(request):
   subdomain = request.META['HTTP_HOST'].split('.')[0]
   if subdomain not in reg_subdoms:
     try:
-      subdomain = request.META['HTTP_HOST'].split('.')[0]
       business = CustomBusinessUser.objects.get(business_slug=subdomain)
     except:
       warning = f'Business with slug name "{subdomain}" does not exist.'
       return render(request, 'home/home.html', {'warning': warning})
-
+    slug = subdomain
     stripe_user = get_stripe_user(business.user)
     context = {
       'business_name': business.business_name,
@@ -516,7 +515,7 @@ def home(request):
         'unbooked_last_month': last_month_appointments & unbooked_appointments
       }, 
     }
-  return render(request, 'home/home.html', context)
+    return render(request, 'home/home.html', context)
 
 def login_page(request):
   subdomain = request.META['HTTP_HOST'].split('.')[0]
