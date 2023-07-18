@@ -210,6 +210,8 @@ def update_profile(request):
 
       try:
         business_name = trim(request.POST['business_name'])
+        if business_name.lower() in reg_subdoms:
+          raise Exception('Business name not permitted due to slug generation matching server subdomain')
         user_profile = CustomBusinessUser.objects.get(user=request.user)
         user_profile.business_name = business_name
         slug = generate_unique_slug(CustomBusinessUser, user_profile, user_profile.business_name, 'business_slug')
@@ -578,6 +580,9 @@ def register(request):
       first_name = trim(request.POST['first-name'])
       last_name = trim(request.POST['last-name'])
       business_name = trim(request.POST['business-name'])
+      if business_name.lower() in reg_subdoms:
+        warning = 'Business name is not permitted due to slug generation matching subdomains. Please choose another name.'
+        return render(request, 'register.html', {'warning': warning})
       timezone = request.POST['timezone']
       if timezone not in pytz.all_timezones:
         timezone = 'UTC'
