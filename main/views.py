@@ -160,7 +160,7 @@ def profile(request):
     'business_bio_length': user_profile._meta.get_field('business_bio').max_length,
     'business_slug': user_profile.business_slug,
     'pref_tz': user_profile.pref_tz,    'business_qr': user_profile.qr_code.url if bool(user_profile.qr_code) else False,
-    'business_url': reverse('business_schedule', args=[user_profile.business_slug]),
+    'business_url': f'https://{user_profile.business_slug}.potterbook.co/',
     'business_services': [[i, slugify(i.service), f'{str(i.price)[0:-2]}.{str(i.price)[-2:]}'] for i in services]
   }
   return render(request, 'profile/profile.html', context=context)
