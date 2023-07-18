@@ -351,6 +351,7 @@ def disconnect(request):
       
 # Create your views here.
 def home(request):
+  context = None
   subdomain = request.META['HTTP_HOST'].split('.')[0]
   if subdomain not in reg_subdoms:
     try:
@@ -515,7 +516,7 @@ def home(request):
         'unbooked_last_month': last_month_appointments & unbooked_appointments
       }, 
     }
-    return render(request, 'home/home.html', context)
+  return render(request, 'home/home.html', context)
 
 def login_page(request):
   subdomain = request.META['HTTP_HOST'].split('.')[0]
