@@ -624,7 +624,7 @@ def register(request):
     <body>
         <div>
         <p>Hello there {first_name},</p>
-        <p>Thank you for registering to CalendarApp! We hope that our booking tool will help your business to reach new heights and facilitate the booking process for your clients!</p>
+        <p>Thank you for registering to {company}! We hope that our booking tool will help your business to reach new heights and facilitate the booking process for your clients!</p>
         <p>Thanks so much,</p>
         <p>The {company} team.</p>
         </div>
