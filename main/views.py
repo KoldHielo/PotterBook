@@ -163,6 +163,8 @@ def profile(request):
     'business_url': f'https://{user_profile.business_slug}.potterbook.co/',
     'business_services': [[i, slugify(i.service), f'{str(i.price)[0:-2]}.{str(i.price)[-2:]}'] for i in services]
   }
+  if subdomain == 'www':
+    context['is_www'] = True
   return render(request, 'profile/profile.html', context=context)
 
 def update_profile(request):
@@ -353,7 +355,7 @@ def disconnect(request):
       
 # Create your views here.
 def home(request):
-  context = None
+  context = {}
   subdomain = request.META['HTTP_HOST'].split('.')[0]
   if subdomain not in reg_subdoms:
     try:
@@ -382,7 +384,6 @@ def home(request):
       return render(request, 'business_schedule.html', context)
       
   elif subdomain in reg_subdoms and request.user.is_authenticated:
-    context = None
     now = timezone.make_aware(datetime.utcnow())
     
     last_month = now.month - 1
@@ -518,6 +519,8 @@ def home(request):
         'unbooked_last_month': last_month_appointments & unbooked_appointments
       }, 
     }
+  if subdomain == 'www':
+    context['is_www'] = True
   return render(request, 'home/home.html', context)
 
 def login_page(request):
@@ -544,7 +547,10 @@ def login_page(request):
           'Username and/or password are incorrect. Please try again.'
         )
         return redirect('login')
-    return render(request, 'login.html')
+    context = {}
+    if subdomain == 'www':
+      context['is_www'] = True
+    return render(request, 'login.html', context)
   else:
     messages.success(
       request,
@@ -574,6 +580,8 @@ def register(request):
       'replace_state': reverse('home'),
       'warning': 'Logged in users cannot access this page'
     }
+    if subdomain == 'www':
+      context['is_www'] = True
     return render(request, 'home/home.html', context)
   if request.method == 'POST':
     try:
@@ -596,12 +604,16 @@ def register(request):
       context = {
       'warning': 'Invalid form submission. Please try again.'
     }
+      if subdomain == 'www':
+        context['is_www'] = True
       return render(request, 'register.html', context)
     #Verify that username doesn't exist
     if validate_email(email) == False or validate_post_data(request.POST.copy()) == False:
       context = {
       'warning': 'Invalid form submission. Please try again.'
-    }
+      }
+      if subdomain == 'www':
+        context['is_www'] = True
       return render(request, 'register.html', context)
     
     
@@ -609,18 +621,24 @@ def register(request):
     if user_exists:
       context = {
       'warning': 'Account with this email already exists. Please try again.'
-    }
+      }
+      if subdomain == 'www':
+        context['is_www'] = True
       return render(request, 'register.html', context)
     password_check = validate_passwords(password, confirm_password)
     if password_check == 'no match':
       context = {
         'warning': 'Your passwords didn\'t match up. Please try again.'
       }
+      if subdomain == 'www':
+        context['is_www'] = True
       return render(request, 'register.html', context)
     elif password_check == 'incorrect format':
       context = {
         'warning': 'Your passwords do not meet the specified criteria. Please try again.'
       }
+      if subdomain == 'www':
+        context['is_www'] = True
       return render(request, 'register.html', context)
     #If everything checks out on the form, create and save user
     new_user = get_user_model().objects.create_user(
@@ -715,14 +733,21 @@ def register(request):
         'replace_state': reverse('profile'),
         'pref_tz': timezone
     }
+      if subdomain == 'www':
+        context['is_www'] = True
       return render(request, 'profile/profile.html', context)
     else:
       context = {
       'warning': 'Something went wrong. Please try again.'
     }
+      if subdomain == 'www':
+        context['is_www'] = True
       return render(request, 'register.html', context)
   else:
-    return render(request, 'register.html')
+    context = {}
+    if subdomain == 'www':
+      context['is_www'] = True
+    return render(request, 'register.html', context)
 
 #Calendar
 def edit_availability(request):
@@ -932,6 +957,7 @@ def retreive_dates(request, slug):
     return render(request, 'home/home.html', {'warning': warning})
 
 def book_slot(request, slug):
+  subdomain = request.META['HTTP_HOST'].split('.')[0]
   if request.method == 'POST':
     try:
       business = CustomBusinessUser.objects.get(business_slug=slug)
@@ -958,6 +984,8 @@ def book_slot(request, slug):
       context = {
         'warning': 'Invalid form submission. Please try again.'
       }
+      if subdomain == 'www':
+        context['is_www'] = True
       business = CustomBusinessUser.objects.filter(business_slug=slug)
       if business.exists():
         context['business_slug'] = slug
@@ -987,6 +1015,8 @@ def book_slot(request, slug):
       'business_name': business.business_name,
       'stripe_id': business.stripe_id
     }
+    if subdomain == 'www':
+      context['is_www'] = True
     if all_services is not None:
       context['all_services'] = all_services
       return render(request, 'book_appointment.html', context=context)
@@ -1045,6 +1075,7 @@ def create_payment_intent(request, slug):
     return JsonResponse({'warning': warning})
       
 def handle_payment(request, slug):
+  subdomain = request.META['HTTP_HOST'].split('.')[0]
   if request.method == 'POST':
     try:
       business = CustomBusinessUser.objects.get(business_slug=slug)
@@ -1077,6 +1108,8 @@ def handle_payment(request, slug):
       context = {
         'warning': 'Invalid form submission. This can happen if you untick the Terms and Conditions as the payment is proccessing or manipulating the Javascript code. Any pending funds in your bank will be cancelled and you won\'t be charged.'
       }
+      if subdomain == 'www':
+        context['is_www'] = True
       business = CustomBusinessUser.objects.filter(business_slug=slug)
       if business.exists():
         context['business_slug'] = slug
@@ -1165,6 +1198,8 @@ def handle_payment(request, slug):
             'readable_date': f'{readable_date} - {tz_string} Timezone',
             'pay_ref': app.charge_id 
           }
+          if subdomain == 'www':
+            context['is_www'] = True
           return render(request, 'payment_success.html', context=context)
         else:
           context = {
@@ -1174,7 +1209,9 @@ def handle_payment(request, slug):
             'business_name': business.business_name,
             'business_bio': business.business_bio if business.business_bio is not None else False,
             'replace_state': reverse('business_schedule', args=[slug])
-        }
+          }
+          if subdomain == 'www':
+            context['is_www'] = True
         return render(request, 'business_schedule.html', context)
       elif intent_check.exists() is True:
         context = {
@@ -1185,6 +1222,8 @@ def handle_payment(request, slug):
           'business_bio': business.business_bio if business.business_bio is not None else False,
           'replace_state': reverse('business_schedule', args=[slug])
         }
+        if subdomain == 'www':
+          context['is_www'] = True
         return render(request, 'business_schedule.html', context)
       else:
         stripe.PaymentIntent.cancel(
@@ -1199,6 +1238,8 @@ def handle_payment(request, slug):
           'business_bio': business.business_bio if business.business_bio is not None else False,
           'replace_state': reverse('business_schedule', args=[slug])
         }
+        if subdomain == 'www':
+          context['is_www'] = True
         return render(request, 'business_schedule.html', context)
     except:
       intent_to_cancel = stripe.PaymentIntent.retrieve(
@@ -1225,6 +1266,8 @@ def handle_payment(request, slug):
         'business_bio': business.business_bio if business.business_bio is not None else False,
         'replace_state': reverse('business_schedule', args=[slug])
       }
+      if subdomain == 'www':
+        context['is_www'] = True
       return render(request, 'business_schedule.html', context)
 '''
 def business_schedule(request, slug):
@@ -1270,16 +1313,25 @@ def verify_appointment(request, code):
       appointment.qr_code.delete()
       appointment.verified = True
       appointment.save()
-      return render(request, 'verify_appointment.html', {
+      context = {
         'verified': True,
         'already_verified': already_verified,
         'appointment': appointment
-      })
+      }
+      if subdomain == 'www':
+        context['is_www'] = True
+      return render(request, 'verify_appointment.html', context)
     except Exception as e:
-      return render(request, 'verify_appointment.html', {'verified': False})
+      context = {'verified': False}
+      if subdomain == 'www':
+        context['is_www'] = True
+      return render(request, 'verify_appointment.html', context)
   else:
     warning = 'User must be logged in to verify appointments'
-    return render(request, 'home/home.html', {'warning': warning})
+    context = {'warning': warning}
+    if subdomain == 'www':
+      context['is_www'] = True
+    return render(request, 'home/home.html', context)
 
 def fetch_appointments(request, page):
   subdomain = request.META['HTTP_HOST'].split('.')[0]
@@ -1478,15 +1530,21 @@ def appointment_config(request):
 
 def pricing_page(request):
   subdomain = request.META['HTTP_HOST'].split('.')[0]
+  context = {}
+  if subdomain == 'www':
+    context['is_www'] = True
   if subdomain not in reg_subdoms:
     raise Http404('Invalid subdomain for this view.')
-  return render(request, 'pricing.html')
+  return render(request, 'pricing.html', context)
 
 def contact_page(request):
   subdomain = request.META['HTTP_HOST'].split('.')[0]
+  context = {}
+  if subdomain == 'www':
+    context['is_www'] = True
   if subdomain not in reg_subdoms:
     raise Http404('Invalid subdomain for this view.')
-  return render(request, 'contact.html')
+  return render(request, 'contact.html', context)
 
 def forgot_password(request):
   subdomain = request.META['HTTP_HOST'].split('.')[0]
@@ -1540,7 +1598,10 @@ def forgot_password(request):
     )
     return JsonResponse({'processed': True})
   else:
-    return render(request, 'forgotpassword/stepone.html')
+    context = {}
+    if subdomain == 'www':
+      context['is_www'] = True
+    return render(request, 'forgotpassword/stepone.html', context)
 
 def reset_password(request, code):
   subdomain = request.META['HTTP_HOST'].split('.')[0]
@@ -1574,20 +1635,32 @@ def reset_password(request, code):
       )
     except:
       warning = 'Reset link not found. If you are having problems, please go through the password reset process again.'
-      return render(request, 'home/home.html', {'warning': warning, 'replace_state': '/'})
-    return render(request, 'forgotpassword/steptwo.html', {'code': code, 'business': business})
+      context = {'warning': warning, 'replace_state': '/'}
+      if subdomain == 'www':
+        context['is_www'] = True
+      return render(request, 'home/home.html', context)
+    return render(request, 'forgotpassword/steptwo.html', {'code': code, 'business': business, 'is_www': True if subdomain is 'www' else None})
   else:
     warning = 'Logged in users can not access the password reset page.'
-    return render(request, 'home/home.html', {'warning': warning, 'replace_state': '/'})
+    context = {'warning': warning, 'replace_state': '/'}
+    if subdomain == 'www':
+      context['is_www'] = True
+    return render(request, 'home/home.html', context)
 
 def terms_and_conditions(request):
   subdomain = request.META['HTTP_HOST'].split('.')[0]
   if subdomain not in reg_subdoms:
     raise Http404('Invalid subdomain for this view.')
-  return render(request, 'terms_and_conditions.html')
+  context = {}
+  if subdomain == 'www':
+    context['is_www'] = True
+  return render(request, 'terms_and_conditions.html', context)
 
 def privacy_policy(request):
   subdomain = request.META['HTTP_HOST'].split('.')[0]
   if subdomain not in reg_subdoms:
     raise Http404('Invalid subdomain for this view.')
-  return render(request, 'privacy_policy.html')
+  context = {}
+  if subdomain == 'www':
+    context['is_www'] = True
+  return render(request, 'privacy_policy.html', context)
