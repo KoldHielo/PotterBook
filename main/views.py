@@ -1642,7 +1642,7 @@ def reset_password(request, code):
       if subdomain == 'www':
         context['is_www'] = True
       return render(request, 'home/home.html', context)
-    return render(request, 'forgotpassword/steptwo.html', {'code': code, 'business': business, 'is_www': True if subdomain is 'www' else None})
+    return render(request, 'forgotpassword/steptwo.html', {'code': code, 'business': business, 'is_www': True if subdomain == 'www' else None})
   else:
     warning = 'Logged in users can not access the password reset page.'
     context = {'warning': warning, 'replace_state': '/'}
