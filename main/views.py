@@ -676,7 +676,7 @@ def register(request):
     </head>
     <body style="background-color: #172145; border: 4px solid #263771;">
         <img style="display: block; margin: 20px auto 40px auto; width: 50vw; max-width: 200px;" src="https://live.staticflickr.com/65535/53055275114_dcfc7e36cc_o.png" alt="Logo" />
-        <div style="text-align: center; width: 80%; margin: 30px auto; font-size: 1.4em; font-family: 'Karla';">
+        <div style="text-align: center; width: 80%; margin: 30px auto; font-size: 1.4em; font-family: 'Karla'; color: white;">
         <p>Hello there {first_name},</p>
         <p>Thank you for registering to {company}! We hope that our booking tool will help your business to reach new heights and facilitate the booking process for your clients!</p>
         <p>Thanks so much,</p>
@@ -1163,14 +1163,14 @@ def handle_payment(request, slug):
     </head>
     <body style="background-color: #172145; border: 4px solid #263771;">
         <img style="display: block; margin: 20px auto 40px auto; width: 50vw; max-width: 200px;" src="https://live.staticflickr.com/65535/53055275114_dcfc7e36cc_o.png" alt="Logo" />
-        <div style="text-align: center; width: 80%; margin: 30px auto; font-size: 1.4em; font-family: 'Karla';">
+        <div style="text-align: center; width: 80%; margin: 30px auto; font-size: 1.4em; font-family: 'Karla'; color: white;">
         
           <p>Hello {name},</p>
           <p>Thank you for booking with {bn} for the service {sr}.</p>
           <p>Please keep the date safe in your diary: {readable_date} - {tz_string} Timezone</p>
           <p>We look forward to seeing you! Don\'t forget to let us scan your QR code below to verify your booking!</p>
           <img src="{qr_url}" alt="QR Verification" style="width: 100%; max-width: 300px; dislay: block; margin: 30px auto;">
-          <p style="font-size: 7px;">If you can\'t see the QR image, please forward this link to us: {verify_url}</p>
+          <p style="font-size: 7px;">If you can\'t see the QR image, please forward this link to us: <a href="{verify_url}" target="_blank" style="color: lightgreen; text-decoration: underline;">{verify_url}</a></p>
         </div>
     </body>
 </html>
@@ -1597,7 +1597,7 @@ The {company} team.
     </head>
     <body style="background-color: #172145; border: 4px solid #263771;">
         <img style="display: block; margin: 20px auto 40px auto; width: 50vw; max-width: 200px;" src="https://live.staticflickr.com/65535/53055275114_dcfc7e36cc_o.png" alt="Logo" />
-        <div style="text-align: center; width: 80%; margin: 30px auto; font-size: 1.4em; font-family: 'Karla';">
+        <div style="text-align: center; width: 80%; margin: 30px auto; font-size: 1.4em; font-family: 'Karla'; color: white;">
         <p>Hello {name}</p>
         <p>A request to change your password has been made. Please <a href="{prl}" target="_blank" style="color: lightgreen; text-decoration: underline;">click here</a> to change your password securely.</p>
         <p>If this was not you, please ignore this message. If you have any concerns over security, please reach out to us on our contact page.</p>
