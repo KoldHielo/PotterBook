@@ -1174,13 +1174,29 @@ def handle_payment(request, slug):
           verification_url = request.build_absolute_uri(reverse('verify_appointment', args=[verification_code]))
           email_subject = f'Booking Reference: {app.charge_id}'
           email_message = f'Hello {name},\n\nThank you for booking with {business.business_name} for the service {app.service_reference}. Please keep the date safe in your diary:\n\n{readable_date} - {tz_string} Timezone\n\nWe look forward to seeing you!\n\nPlease forward this link to us on attending the booking so we can verify you: {verification_url}'
-          html_message = '''
+          html_message = '''<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Karla&display=swap" rel="stylesheet">
+    </head>
+    <body style="background-color: #172145; border: 4px solid #263771;">
+        <img style="display: block; margin: 20px auto 40px auto; width: 50vw; max-width: 200px;" src="https://live.staticflickr.com/65535/53055275114_dcfc7e36cc_o.png" alt="Logo" />
+        <div style="text-align: center; width: 80%; margin: 30px auto; font-size: 1.4em; font-family: 'Karla';">
+        
           <p>Hello {name},</p>
           <p>Thank you for booking with {bn} for the service {sr}.</p>
           <p>Please keep the date safe in your diary: {readable_date} - {tz_string} Timezone</p>
           <p>We look forward to seeing you! Don\'t forget to let us scan your QR code below to verify your booking!</p>
           <img src="{qr_url}" alt="QR Verification" style="width: 100%; max-width: 300px; dislay: block; margin: 30px auto;">
-          <p style="font-size: 7px;">If you can\'t see the QR image, please forward this link to us: {verify_url}</p>'''.format(
+          <p style="font-size: 7px;">If you can\'t see the QR image, please forward this link to us: {verify_url}</p>
+        </div>
+    </body>
+</html>
+          '''.format(
             qr_url=request.build_absolute_uri(app.qr_code.url),
             name=name,
             sr=app.service_reference,
@@ -1192,7 +1208,7 @@ def handle_payment(request, slug):
           send_mail(email_subject, email_message, 'info@potterbook.co', [client_email], html_message=html_message)
           send_mail(
             f'New Booking: {client_name}',
-            f'Customer Name: {client_name}\nEmail: {client_email}\nBooked For: {business_readable_date} - {business_tz} Timezone\nService Required: {service.service}\nPayment Ref: {app.charge_id}\n',
+            f'Customer Name: {client_name}\nEmail: {client_email}\nTelephone: {app.telephone}\nAddress: {app.address}\nBooked For: {business_readable_date} - {business_tz} Timezone\nService Required: {service.service}\nPayment Ref: {app.charge_id}\nClient Note: {request.POST["note"]}',
             'info@potterbook.co',
             [business.user.email]
           )
@@ -1576,28 +1592,52 @@ def forgot_password(request):
     business.password_reset_code = hash
     business.save()
     subject = f'{company}: Password Reset'
-    message = '''
-    Hello {name},
+    message = '''Hello {name},
+    
+A request to change your password has been made. Please click the following link and follow the instructions to create a new password:
 
-    A request to change your password has been made. Please click the following link and follow the instructions to create a new password:
+{prl}
 
-    {prl}
+If this wasn't you, please ignore this message. If you have any concerns over security, please contact us for any reassurance needed.
 
-    If this wasn't you, please ignore this message. If you have any concerns over security, please contact us for any reassurance needed.
+Thanks,
 
-    Thanks,
-
-    The {company} team.
+The {company} team.
     '''.format(
       name=user.first_name,
       prl=request.build_absolute_uri(reverse('reset_password', args=[url_secret])),
       company=company
     )
+    html_message = '''<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Karla&display=swap" rel="stylesheet">
+    </head>
+    <body style="background-color: #172145; border: 4px solid #263771;">
+        <img style="display: block; margin: 20px auto 40px auto; width: 50vw; max-width: 200px;" src="https://live.staticflickr.com/65535/53055275114_dcfc7e36cc_o.png" alt="Logo" />
+        <div style="text-align: center; width: 80%; margin: 30px auto; font-size: 1.4em; font-family: 'Karla';">
+        <p>Hello {name}</p>
+        <p>A request to change your password has been made. Please <a href="{prl}" target="_blank" style="color: lightgreen; text-decoration: underline;">click here</a> to change your password securely.</p>
+        <p>If this was not you, please ignore this message. If you have any concerns over security, please reach out to us on our contact page.</p>
+        <p>Thanks!</p>
+        <p>The {company} team.</p>
+        </div>
+    </body>
+</html>'''.format(
+  name=user.first_name,
+  prl=request.build_absolute_uri(reverse('reset_password', args=[url_secret])),
+  company=company
+)
     mail_status = send_mail(
       subject=subject,
       message=message,
       from_email='info@potterbook.co',
       recipient_list=[user.email],
+      html_message=html_message
     )
     return JsonResponse({'processed': True})
   else:
