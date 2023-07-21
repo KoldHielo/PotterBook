@@ -670,35 +670,13 @@ def register(request):
     <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <style>
-        
-            @import url('https://fonts.googleapis.com/css2?family=Edu+TAS+Beginner&display=swap');
-            
-            * {{
-                font-family: "Edu TAS Beginner", Arial, Sans-Serif, monospace;
-            }}
-            
-            img:first-of-type {{
-                display: block;
-                margin: 0 auto;
-                width: 300px;
-                border-radius: 45%;
-            }}
-            
-            p {{
-                width: 80%;
-                margin: 30px auto;
-            }}
-            
-            div:nth-of-type(2) {{
-                width: 80%;
-                margin: 20px auto;
-                border: 5px solid;
-            }}
-        </style>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Karla&display=swap" rel="stylesheet">
     </head>
-    <body>
-        <div>
+    <body style="background-color: #172145; border: 4px solid #263771;">
+        <img style="display: block; margin: 20px auto 40px auto; width: 50vw; max-width: 200px;" src="https://live.staticflickr.com/65535/53055275114_dcfc7e36cc_o.png" alt="Logo" />
+        <div style="text-align: center; width: 80%; margin: 30px auto; font-size: 1.4em; font-family: 'Karla';">
         <p>Hello there {first_name},</p>
         <p>Thank you for registering to {company}! We hope that our booking tool will help your business to reach new heights and facilitate the booking process for your clients!</p>
         <p>Thanks so much,</p>
