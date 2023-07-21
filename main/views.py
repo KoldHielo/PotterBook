@@ -698,7 +698,7 @@ def register(request):
       auth_url = stripe.OAuth.authorize_url(
     client_id=os.environ['STRIPE_CONNECT_ID'],
     scope='read_write',
-    redirect_uri='https://calendar-app.team-oldfield.repl.co/connect/'
+    redirect_uri=request.build_absolute_uri(reverse('connect'))
   ) if stripe_user is None else None
       context = {
         'auth_url': auth_url,
