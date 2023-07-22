@@ -22,7 +22,8 @@ class CustomBusinessUser(models.Model):
   password_reset_date = models.DateTimeField(blank=True, null=True)
   password_reset_code = models.TextField(blank=True, null=True)
   business_accept = models.BooleanField(default=False, blank=True, null=True, verbose_name='Business accepted terms and conditions and privacy policy')
-  
+  email_verified = models.BooleanField(default=False)
+
   def __str__(self):
     return self.business_slug
 
