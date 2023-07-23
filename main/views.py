@@ -1034,7 +1034,7 @@ def create_payment_intent(request, slug):
   if appointment.exists() and business_stripe_user is not None and price == service.price:
     description = f'{service.service} @ {readable_date}'
     amount = service.price
-    my_percentage = 0.1
+    my_percentage = 0.02
     application_fee = int(amount * my_percentage)
     intent = stripe.PaymentIntent.create(
       amount=amount,
