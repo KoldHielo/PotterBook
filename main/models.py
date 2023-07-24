@@ -22,7 +22,6 @@ class CustomBusinessUser(models.Model):
   password_reset_date = models.DateTimeField(blank=True, null=True)
   password_reset_code = models.TextField(blank=True, null=True)
   business_accept = models.BooleanField(default=False, blank=True, null=True, verbose_name='Business accepted terms and conditions and privacy policy')
-  email_verified = models.BooleanField(default=False)
 
   def __str__(self):
     return self.business_slug
@@ -65,3 +64,8 @@ class Appointment(models.Model):
   def __str__(self):
     business = CustomBusinessUser.objects.get(user=self.business).business_slug
     return f'{"~" if self.is_booked is True else ""}{business} - {self.slot}'
+  
+  class EmailToken(models.Model):
+    token = models.TextField()
+    date = models.DateTimeField(auto_now_add=True)
+    user  = models.OneToOneField(get_user_model(), on_delete=models.CASCADE)

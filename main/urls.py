@@ -31,6 +31,7 @@ urlpatterns = [
   path('resetpassword/<str:code>/', views.reset_password, name='reset_password'),
   path('termsandconditions/', views.terms_and_conditions, name='terms_and_conditions'),
   path('privacypolicy/', views.privacy_policy, name='privacy_policy'),
+  path('verifyemail/', views.verify_email, name='verify_email'),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

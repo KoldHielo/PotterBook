@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from django.http import JsonResponse, Http404
+from django.http import JsonResponse, Http404, HttpResponseRedirect
 from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.contrib import messages
 from django.core.mail import send_mail
@@ -7,7 +7,7 @@ from django.urls import reverse
 from django.core.files.images import ImageFile
 import re
 from django.contrib.auth.models import User
-from .models import CustomBusinessUser, Appointment, Service
+from .models import CustomBusinessUser, Appointment, Service, EmailToken
 import os
 import io
 import stripe
@@ -553,6 +553,14 @@ def login_page(request):
     context = {}
     if subdomain == 'www':
       context['is_www'] = True
+    if 'verified' in request.GET:
+      verified = request.GET.get('verified', None)
+      if verified == 'True':
+        context['message'] = 'You have successfully verified your email! Please log in to access your account'
+      elif verified == 'False':
+        context['warning'] = 'Email verification was unsuccessful. Please try again.'
+    elif 'new_user' in request.GET:
+      context['message'] = 'Thank you for signing up! Please check your email inbox and junk folders to verify your account.'
     return render(request, 'login.html', context)
   else:
     messages.success(
@@ -649,7 +657,8 @@ def register(request):
       password=password,
       email=email,
       first_name=first_name,
-      last_name=last_name
+      last_name=last_name,
+      is_active=False
     )
     user_profile = CustomBusinessUser.objects.create(
       user=new_user,
@@ -662,9 +671,17 @@ def register(request):
     qr_img = generate_qr_code(f'https://{slug}.potterbook.co/', f'{slug}-qr', 'png')
     user_profile.qr_code = qr_img
     user_profile.save()
+
+    token = secrets.token_urlsafe(255)
+    token_hash = hash_value(token)
+    EmailToken.objects.create(
+      token=token_hash,
+      user=new_user
+    )
+    auth_url = request.build_absolute_uri(reverse('verify_email') + f'?token={token}')
     #Email welcome message to user and confirmation link
     subject = f'Welcome to {company}!'
-    message = f'Hello there {first_name},\n\nThank you for registering to {company}! We hope that our booking tool will help your business to reach new heights and facilitate the booking process for your clients!\n\nThanks so much,\n\nThe {company} team.'
+    message = f'Hello there {first_name},\n\nThank you for registering to {company}! We hope that our booking tool will help your business to reach new heights and facilitate the booking process for your clients!\n\nWe just need you to confirm your email address by clicking this link before you can access your account:\n\n{auth_url}\n\nThanks so much,\n\nThe {company} team.'
     html_message = '''<!DOCTYPE html>
 <html>
     <head>
@@ -679,11 +696,16 @@ def register(request):
         <div style="text-align: center; width: 80%; margin: 30px auto; font-size: 1.4em; font-family: 'Karla'; color: white;">
         <p>Hello there {first_name},</p>
         <p>Thank you for registering to {company}! We hope that our booking tool will help your business to reach new heights and facilitate the booking process for your clients!</p>
+        <p>We just need you to verify your email address before you can access your account by <a href="{auth_url}" target="_blank" style="color: lightgreen; text-decoration: underline;">clicking here</a>.</p>
         <p>Thanks so much,</p>
         <p>The {company} team.</p>
         </div>
     </body>
-</html>'''.format(first_name=first_name, company=company)
+</html>'''.format(
+      first_name=first_name,
+      company=company,
+      auth_url=auth_url
+      )
     send_mail(
       subject=subject,
       message=message,
@@ -691,39 +713,8 @@ def register(request):
       from_email='info@potterbook.co',
       recipient_list=[email]
     )
-    login_user = authenticate(username=email, password=password)
-    if login_user is not None:
-      login(request, login_user)
-      stripe_user = get_stripe_user(new_user)
-      auth_url = stripe.OAuth.authorize_url(
-    client_id=os.environ['STRIPE_CONNECT_ID'],
-    scope='read_write',
-    redirect_uri=request.build_absolute_uri(reverse('connect'))
-  ) if stripe_user is None else None
-      context = {
-        'auth_url': auth_url,
-        'stripe_linked': bool(stripe_user),
-        'user_photo': user_profile.photo.url if bool(user_profile.photo) else False,
-        'business_name': user_profile.business_name,
-        'business_bio': user_profile.business_bio,
-        'business_bio_length': user_profile._meta.get_field('business_bio').max_length,
-        'business_slug': user_profile.business_slug,
-        'business_qr': user_profile.qr_code.url if bool(user_profile.qr_code) else False,
-        'business_url': f'https://{user_profile.business_slug}.potterbook.co/',
-        'message': 'You have successfully created an account! Please update your profile to get the best experience',
-        'replace_state': reverse('profile'),
-        'pref_tz': timezone
-    }
-      if subdomain == 'www':
-        context['is_www'] = True
-      return render(request, 'profile/profile.html', context)
-    else:
-      context = {
-      'warning': 'Something went wrong. Please try again.'
-    }
-      if subdomain == 'www':
-        context['is_www'] = True
-      return render(request, 'register.html', context)
+    #Continue render here after email auth
+    return HttpResponseRedirect(reverse('login') + '?new_user=True')
   else:
     context = {}
     if subdomain == 'www':
@@ -1685,3 +1676,25 @@ def privacy_policy(request):
   if subdomain == 'www':
     context['is_www'] = True
   return render(request, 'privacy_policy.html', context)
+
+def verify_email(request):
+  if request.method == 'GET' and request.user.is_authenticated == False:
+    token = request.GET.get('token', None)
+    if token is not None:
+      try:
+        token_hash = hash_value(token)
+        email_token = EmailToken.objects.get(
+          token=token_hash
+        )
+        user = email_token.user
+        user.is_active = True
+        user.save()
+        email_token.delete()
+        return HttpResponseRedirect(reverse('login') + '?verified=True')
+      except:
+        return HttpResponseRedirect(reverse('login') + '?verified=False')
+    else:
+      return HttpResponseRedirect(reverse('login') + '?verified=False')
+  else:
+    return HttpResponseRedirect(reverse('login') + '?verified=False')
+        
