@@ -65,7 +65,7 @@ class Appointment(models.Model):
     business = CustomBusinessUser.objects.get(user=self.business).business_slug
     return f'{"~" if self.is_booked is True else ""}{business} - {self.slot}'
   
-  class EmailToken(models.Model):
-    token = models.TextField()
-    date = models.DateTimeField(auto_now_add=True)
-    user  = models.OneToOneField(get_user_model(), on_delete=models.CASCADE)
+class EmailToken(models.Model):
+  token = models.TextField()
+  date = models.DateTimeField(auto_now_add=True)
+  user  = models.OneToOneField(get_user_model(), on_delete=models.CASCADE)
