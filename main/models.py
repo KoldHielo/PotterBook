@@ -1,5 +1,8 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+from django.conf import settings
+import os
+import shutil
 
 # Create your models here.
 
@@ -25,6 +28,12 @@ class CustomBusinessUser(models.Model):
 
   def __str__(self):
     return self.business_slug
+    
+  def delete(self, *args, **kwargs):
+    folder_path = os.path.join(settings.MEDIA_ROOT, f'businesses/{self.id}')
+    if os.path.exists(folder_path) and os.path.isdir(folder_path):
+      shutil.rmtree(folder_path)
+    super().delete(*args, **kwargs)
 
 class Service(models.Model):
   business = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
