@@ -24,9 +24,9 @@ from hashlib import sha256
 import pytz
 
 
-company = 'PotterBook'
+company = 'PotterMouth'
 stripe.api_key = os.environ['STRIPE_SK']
-reg_subdoms = {'www', 'potterbook'}
+reg_subdoms = {'www', 'pottermouth'}
 
 def convert_tz(dtObj, tz_string):
   tz = pytz.timezone(tz_string)
