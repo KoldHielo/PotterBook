@@ -1146,7 +1146,7 @@
 
     editAvailabilityForm.addEventListener('submit', e => {
       e.preventDefault();
-      const times = document.querySelectorAll('[name="time"] > option:selected');
+      const times = document.querySelectorAll('[name="time"] > option:checked');
       if(times.length > 10) {
         alert('Can only select up to 10 timeslots at a time');
         return;
