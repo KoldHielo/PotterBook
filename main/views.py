@@ -782,24 +782,11 @@ def edit_availability(request):
         ),
         tz_string
       )
-    elif over_period == 'years':
-      date_until = assert_tz(
-        datetime(
-          date_until.year + quantityDWM,
-          date_until.month,
-          date_until.day,
-          date_until.hour,
-          date_until.minute,
-          date_until.second,
-          date_until.microsecond
-        ),
-        tz_string
-      )
     else:
       warning = f'"{over_period}" is not a valid response'
       return JsonResponse({'warning': warning})
     #While loop
-    if quantityDWM >= 1 and quantityDWM <= 100:
+    if quantityDWM >= 1 and quantityDWM <= 50 and len(times) <= 50:
       time_pattern = re.compile(r'^([01]\d|2[0-3]):([0-5]\d)$')
       alien_time = False
       while date <= date_until:
@@ -845,7 +832,7 @@ def edit_availability(request):
       )
       appointments.delete()
     else:
-      warning = 'Quantity of weeks/months/days must be between 1 and 100'
+      warning = 'Quantity of weeks/months must be between 1 and 50 and can only select 10 timeslots at a time'
       return JsonResponse({'warning': warning})
     if alien_time:
       message = 'Schedule successfully updated with valid times! (Some errors in list of times due to javascript manipulation)'
