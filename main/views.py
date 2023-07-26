@@ -692,7 +692,7 @@ def register(request):
         <link href="https://fonts.googleapis.com/css2?family=Karla&display=swap" rel="stylesheet">
     </head>
     <body style="background-color: #172145; border: 4px solid #263771;">
-        <img style="display: block; margin: 20px auto 40px auto; width: 50vw; max-width: 200px;" src="https://live.staticflickr.com/65535/53055275114_dcfc7e36cc_o.png" alt="Logo" />
+        <img style="display: block; margin: 20px auto 40px auto; width: 50vw; max-width: 200px;" src="https://live.staticflickr.com/65535/53071725572_437b75e701_o.png" alt="Logo" />
         <div style="text-align: center; width: 80%; margin: 30px auto; font-size: 1.4em; font-family: 'Karla'; color: white;">
         <p>Hello there {first_name},</p>
         <p>Thank you for registering to {company}! We hope that our booking tool will help your business to reach new heights and facilitate the booking process for your clients!</p>
@@ -1140,7 +1140,7 @@ def handle_payment(request, slug):
         <link href="https://fonts.googleapis.com/css2?family=Karla&display=swap" rel="stylesheet">
     </head>
     <body style="background-color: #172145; border: 4px solid #263771;">
-        <img style="display: block; margin: 20px auto 40px auto; width: 50vw; max-width: 200px;" src="https://live.staticflickr.com/65535/53055275114_dcfc7e36cc_o.png" alt="Logo" />
+        <img style="display: block; margin: 20px auto 40px auto; width: 50vw; max-width: 200px;" src="https://live.staticflickr.com/65535/53071725572_437b75e701_o.png" alt="Logo" />
         <div style="text-align: center; width: 80%; margin: 30px auto; font-size: 1.4em; font-family: 'Karla'; color: white;">
         
           <p>Hello {name},</p>
@@ -1574,7 +1574,7 @@ The {company} team.
         <link href="https://fonts.googleapis.com/css2?family=Karla&display=swap" rel="stylesheet">
     </head>
     <body style="background-color: #172145; border: 4px solid #263771;">
-        <img style="display: block; margin: 20px auto 40px auto; width: 50vw; max-width: 200px;" src="https://live.staticflickr.com/65535/53055275114_dcfc7e36cc_o.png" alt="Logo" />
+        <img style="display: block; margin: 20px auto 40px auto; width: 50vw; max-width: 200px;" src="https://live.staticflickr.com/65535/53071725572_437b75e701_o.png" alt="Logo" />
         <div style="text-align: center; width: 80%; margin: 30px auto; font-size: 1.4em; font-family: 'Karla'; color: white;">
         <p>Hello {name}</p>
         <p>A request to change your password has been made. Please <a href="{prl}" target="_blank" style="color: lightgreen; text-decoration: underline;">click here</a> to change your password securely.</p>
