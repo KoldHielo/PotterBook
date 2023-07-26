@@ -1146,6 +1146,11 @@
 
     editAvailabilityForm.addEventListener('submit', e => {
       e.preventDefault();
+      const times = document.querySelectorAll('[name="times"] > option:selected');
+      if(times.length > 10) {
+        alert('Can only select up to 10 timeslots at a time');
+        return;
+      }
       const formData = new FormData(e.target);
       const url = '{% url "edit_availability" %}';
       fetch(url, {
