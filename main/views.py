@@ -693,7 +693,7 @@ def register(request):
     </head>
     <body style="background-color: #172145; border: 4px solid #263771;">
         <img style="display: block; margin: 20px auto 40px auto; width: 50vw; max-width: 200px;" src="https://live.staticflickr.com/65535/53071725572_437b75e701_o.png" alt="Logo" />
-        <div style="text-align: center; width: 80%; margin: 30px auto; font-size: 1.4em; font-family: 'Karla'; color: white;">
+        <div style="text-align: center; width: 80%; margin: 30px auto; font-size: 1.4em; font-family: 'Karla', Arial; color: white;">
         <p>Hello there {first_name},</p>
         <p>Thank you for registering to {company}! We hope that our booking tool will help your business to reach new heights and facilitate the booking process for your clients!</p>
         <p>We just need you to verify your email address before you can access your account by <a href="{auth_url}" target="_blank" style="color: lightgreen; text-decoration: underline;">clicking here</a>. Please do this within 24 hours or your account will be removed and you will have to register again.</p>
@@ -1141,7 +1141,7 @@ def handle_payment(request, slug):
     </head>
     <body style="background-color: #172145; border: 4px solid #263771;">
         <img style="display: block; margin: 20px auto 40px auto; width: 50vw; max-width: 200px;" src="https://live.staticflickr.com/65535/53071725572_437b75e701_o.png" alt="Logo" />
-        <div style="text-align: center; width: 80%; margin: 30px auto; font-size: 1.4em; font-family: 'Karla'; color: white;">
+        <div style="text-align: center; width: 80%; margin: 30px auto; font-size: 1.4em; font-family: 'Karla', Arial; color: white;">
         
           <p>Hello {name},</p>
           <p>Thank you for booking with {bn} for the service {sr}.</p>
@@ -1577,7 +1577,7 @@ The {company} team.
     </head>
     <body style="background-color: #172145; border: 4px solid #263771;">
         <img style="display: block; margin: 20px auto 40px auto; width: 50vw; max-width: 200px;" src="https://live.staticflickr.com/65535/53071725572_437b75e701_o.png" alt="Logo" />
-        <div style="text-align: center; width: 80%; margin: 30px auto; font-size: 1.4em; font-family: 'Karla'; color: white;">
+        <div style="text-align: center; width: 80%; margin: 30px auto; font-size: 1.4em; font-family: 'Karla', Arial; color: white;">
         <p>Hello {name}</p>
         <p>A request to change your password has been made. Please <a href="{prl}" target="_blank" style="color: lightgreen; text-decoration: underline;">click here</a> to change your password securely.</p>
         <p>This password reset request will expire in 1 hour.</p>
