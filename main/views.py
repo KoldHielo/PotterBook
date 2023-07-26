@@ -163,7 +163,7 @@ def profile(request):
     'business_bio_length': user_profile._meta.get_field('business_bio').max_length,
     'business_slug': user_profile.business_slug,
     'pref_tz': user_profile.pref_tz,    'business_qr': user_profile.qr_code.url if bool(user_profile.qr_code) else False,
-    'business_url': f'https://{user_profile.business_slug}.potterbook.co/',
+    'business_url': f'https://{user_profile.business_slug}.pottermouth.com/',
     'business_services': [[i, slugify(i.service), f'{str(i.price)[0:-2]}.{str(i.price)[-2:]}'] for i in services]
   }
   if subdomain == 'www':
@@ -221,7 +221,7 @@ def update_profile(request):
         user_profile.business_name = business_name
         slug = generate_unique_slug(CustomBusinessUser, user_profile, user_profile.business_name, 'business_slug')
         user_profile.business_slug = slug
-        qr_img = generate_qr_code(f'https://{slug}.potterbook.co/', f'{slug}-qr', 'png')
+        qr_img = generate_qr_code(f'https://{slug}.pottermouth.com/', f'{slug}-qr', 'png')
         user_profile.qr_code.delete()
         user_profile.qr_code = qr_img
         user_profile.save()
@@ -668,7 +668,7 @@ def register(request):
     )
     slug = generate_unique_slug(CustomBusinessUser, user_profile, user_profile.business_name, 'business_slug')
     user_profile.business_slug = slug
-    qr_img = generate_qr_code(f'https://{slug}.potterbook.co/', f'{slug}-qr', 'png')
+    qr_img = generate_qr_code(f'https://{slug}.pottermouth.com/', f'{slug}-qr', 'png')
     user_profile.qr_code = qr_img
     user_profile.save()
 
