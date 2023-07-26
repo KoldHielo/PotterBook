@@ -558,7 +558,7 @@ def login_page(request):
       if verified == 'True':
         context['message'] = 'You have successfully verified your email! Please log in to access your account'
       elif verified == 'False':
-        context['warning'] = 'Email verification was unsuccessful. Please try again.'
+        context['warning'] = 'Email verification was unsuccessful.'
     elif 'new_user' in request.GET:
       context['message'] = 'Thank you for signing up! Please check your email inbox and junk folders to verify your account.'
     return render(request, 'login.html', context)
@@ -681,7 +681,7 @@ def register(request):
     auth_url = request.build_absolute_uri(reverse('verify_email') + f'?token={token}')
     #Email welcome message to user and confirmation link
     subject = f'Welcome to {company}!'
-    message = f'Hello there {first_name},\n\nThank you for registering to {company}! We hope that our booking tool will help your business to reach new heights and facilitate the booking process for your clients!\n\nWe just need you to confirm your email address by clicking this link before you can access your account:\n\n{auth_url}\n\nThanks so much,\n\nThe {company} team.'
+    message = f'Hello there {first_name},\n\nThank you for registering to {company}! We hope that our booking tool will help your business to reach new heights and facilitate the booking process for your clients!\n\nWe just need you to confirm your email address by clicking this link before you can access your account:\n\n{auth_url}\n\nPlease do this within 24 hours or your account will be removed and you will have to register again.\n\nThanks so much,\n\nThe {company} team.'
     html_message = '''<!DOCTYPE html>
 <html>
     <head>
@@ -696,7 +696,7 @@ def register(request):
         <div style="text-align: center; width: 80%; margin: 30px auto; font-size: 1.4em; font-family: 'Karla'; color: white;">
         <p>Hello there {first_name},</p>
         <p>Thank you for registering to {company}! We hope that our booking tool will help your business to reach new heights and facilitate the booking process for your clients!</p>
-        <p>We just need you to verify your email address before you can access your account by <a href="{auth_url}" target="_blank" style="color: lightgreen; text-decoration: underline;">clicking here</a>.</p>
+        <p>We just need you to verify your email address before you can access your account by <a href="{auth_url}" target="_blank" style="color: lightgreen; text-decoration: underline;">clicking here</a>. Please do this within 24 hours or your account will be removed and you will have to register again.</p>
         <p>Thanks so much,</p>
         <p>The {company} team.</p>
         </div>
@@ -1554,6 +1554,8 @@ A request to change your password has been made. Please click the following link
 
 {prl}
 
+This reset link will expire in 1 hour.
+
 If this wasn't you, please ignore this message. If you have any concerns over security, please contact us for any reassurance needed.
 
 Thanks,
@@ -1578,6 +1580,7 @@ The {company} team.
         <div style="text-align: center; width: 80%; margin: 30px auto; font-size: 1.4em; font-family: 'Karla'; color: white;">
         <p>Hello {name}</p>
         <p>A request to change your password has been made. Please <a href="{prl}" target="_blank" style="color: lightgreen; text-decoration: underline;">click here</a> to change your password securely.</p>
+        <p>This password reset request will expire in 1 hour.</p>
         <p>If this was not you, please ignore this message. If you have any concerns over security, please reach out to us on our contact page.</p>
         <p>Thanks!</p>
         <p>The {company} team.</p>
@@ -1612,6 +1615,17 @@ def reset_password(request, code):
       business = CustomBusinessUser.objects.get(
         password_reset_code=hash
       )
+      now = timezone.now()
+      reset_expiry = business.password_reset_date + timedelta(hours=1)
+      if now > reset_expiry:
+        business.password_reset_code = None
+        business.password_reset_date = None
+        business.save()
+        warning = 'Password reset link has expired. Please go to the forgot password page to generate a new reset link.'
+        context = {'warning': warning, 'replace_state': '/'}
+        if subdomain == 'www':
+          context['is_www'] = True
+        return render(request, 'home/home.html', context)
       password = request.POST['password']
       password_confirm = request.POST['confirm-password']
     except:
@@ -1674,10 +1688,16 @@ def verify_email(request):
           token=token_hash
         )
         user = email_token.user
-        user.is_active = True
-        user.save()
-        email_token.delete()
-        return HttpResponseRedirect(reverse('login') + '?verified=True')
+        now = timezone.now()
+        token_expiry = email_token.date + timedelta(hours=24)
+        if now <= token_expiry:
+          user.is_active = True
+          user.save()
+          email_token.delete()
+          return HttpResponseRedirect(reverse('login') + '?verified=True')
+        else:
+          user.delete()
+          return HttpResponseRedirect(reverse('login') + '?verified=False')
       except:
         return HttpResponseRedirect(reverse('login') + '?verified=False')
     else:
