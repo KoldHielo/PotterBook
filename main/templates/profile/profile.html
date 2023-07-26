@@ -723,7 +723,6 @@
       <select name="weeksMonthsYears" required>
         <option value="weeks">weeks</option>
         <option value="months">months</option>
-        <option value="years">years</option>
       </select>
       in timezone 
       <select id="ee-timezone" name="ee-timezone">
@@ -837,7 +836,7 @@
       appointmentList.innerHTML = '';
     });
 
-    oneToArgFunc(100).forEach(number => {
+    oneToArgFunc(50).forEach(number => {
       let optionNode = document.createElement('option');
       optionNode.innerHTML = number;
       optionNode.value = number;
