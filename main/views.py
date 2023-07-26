@@ -1622,10 +1622,8 @@ def reset_password(request, code):
         business.password_reset_date = None
         business.save()
         warning = 'Password reset link has expired. Please go to the forgot password page to generate a new reset link.'
-        context = {'warning': warning, 'replace_state': '/'}
-        if subdomain == 'www':
-          context['is_www'] = True
-        return render(request, 'home/home.html', context)
+        context = {'warning': warning, 'changed': False}
+        return JsonResponse(context)
       password = request.POST['password']
       password_confirm = request.POST['confirm-password']
     except:
@@ -1646,6 +1644,17 @@ def reset_password(request, code):
       business = CustomBusinessUser.objects.get(
         password_reset_code=hash_value(code)
       )
+      now = timezone.now()
+      reset_expiry = business.password_reset_date + timedelta(hours=1)
+      if now > reset_expiry:
+        business.password_reset_code = None
+        business.password_reset_date = None
+        business.save()
+        warning = 'Password reset link has expired. Please go to the forgot password page to generate a new reset link.'
+        context = {'warning': warning, 'replace_state': '/'}
+        if subdomain == 'www':
+          context['is_www'] = True
+        return render(request, 'home/home.html', context)
     except:
       warning = 'Reset link not found. If you are having problems, please go through the password reset process again.'
       context = {'warning': warning, 'replace_state': '/'}
