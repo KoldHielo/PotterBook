@@ -786,7 +786,7 @@ def edit_availability(request):
       warning = f'"{over_period}" is not a valid response'
       return JsonResponse({'warning': warning})
     #While loop
-    if quantityDWM >= 1 and quantityDWM <= 50 and len(times) <= 50:
+    if quantityDWM >= 1 and quantityDWM <= 50 and len(times) <= 10:
       time_pattern = re.compile(r'^([01]\d|2[0-3]):([0-5]\d)$')
       alien_time = False
       while date <= date_until:
