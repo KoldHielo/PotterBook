@@ -710,6 +710,7 @@ def register(request):
       subject=subject,
       message=message,
       html_message=html_message,
+      from_email='info@pottermouth.com',
       recipient_list=[email]
     )
     #Continue render here after email auth
@@ -1604,6 +1605,7 @@ The {company} team.
       subject=subject,
       message=message,
       recipient_list=[user.email],
+      from_email='info@pottermouth.com',
       html_message=html_message
     )
     return JsonResponse({'processed': True})
