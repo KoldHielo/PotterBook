@@ -29,8 +29,8 @@ SECRET_KEY = os.environ['SECRET_KEY']
 DEBUG = False
 
 ALLOWED_HOSTS = [
-    'pottermouth.com',
-    '.pottermouth.com'
+    'potterbook.co',
+    '.potterbook.co'
 ]
 
 # FORM SUBMISSION

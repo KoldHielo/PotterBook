@@ -24,9 +24,9 @@ from hashlib import sha256
 import pytz
 
 
-company = 'PotterMouth'
+company = 'PotterBook'
 stripe.api_key = os.environ['STRIPE_SK']
-reg_subdoms = {'www', 'pottermouth'}
+reg_subdoms = {'www', 'potterbook'}
 
 def convert_tz(dtObj, tz_string):
   tz = pytz.timezone(tz_string)
@@ -163,7 +163,7 @@ def profile(request):
     'business_bio_length': user_profile._meta.get_field('business_bio').max_length,
     'business_slug': user_profile.business_slug,
     'pref_tz': user_profile.pref_tz,    'business_qr': user_profile.qr_code.url if bool(user_profile.qr_code) else False,
-    'business_url': f'https://{user_profile.business_slug}.pottermouth.com/',
+    'business_url': f'https://{user_profile.business_slug}.potterbook.co/',
     'business_services': [[i, slugify(i.service), f'{str(i.price)[0:-2]}.{str(i.price)[-2:]}'] for i in services]
   }
   if subdomain == 'www':
@@ -221,7 +221,7 @@ def update_profile(request):
         user_profile.business_name = business_name
         slug = generate_unique_slug(CustomBusinessUser, user_profile, user_profile.business_name, 'business_slug')
         user_profile.business_slug = slug
-        qr_img = generate_qr_code(f'https://{slug}.pottermouth.com/', f'{slug}-qr', 'png')
+        qr_img = generate_qr_code(f'https://{slug}.potterbook.co/', f'{slug}-qr', 'png')
         user_profile.qr_code.delete()
         user_profile.qr_code = qr_img
         user_profile.save()
@@ -668,7 +668,7 @@ def register(request):
     )
     slug = generate_unique_slug(CustomBusinessUser, user_profile, user_profile.business_name, 'business_slug')
     user_profile.business_slug = slug
-    qr_img = generate_qr_code(f'https://{slug}.pottermouth.com/', f'{slug}-qr', 'png')
+    qr_img = generate_qr_code(f'https://{slug}.potterbook.co/', f'{slug}-qr', 'png')
     user_profile.qr_code = qr_img
     user_profile.save()
 
@@ -692,7 +692,7 @@ def register(request):
         <link href="https://fonts.googleapis.com/css2?family=Karla&display=swap" rel="stylesheet">
     </head>
     <body style="background-color: #172145; border: 4px solid #263771;">
-        <img style="display: block; margin: 20px auto 40px auto; width: 50vw; max-width: 200px;" src="https://live.staticflickr.com/65535/53071725572_437b75e701_o.png" alt="Logo" />
+        <img style="display: block; margin: 20px auto 40px auto; width: 50vw; max-width: 200px;" src="https://live.staticflickr.com/65535/53083037967_c9a9974c95_o.png" alt="Logo" />
         <div style="text-align: center; width: 80%; margin: 30px auto; font-size: 1.4em; font-family: 'Karla', Arial; color: white;">
         <p>Hello there {first_name},</p>
         <p>Thank you for registering to {company}! We hope that our booking tool will help your business to reach new heights and facilitate the booking process for your clients!</p>
@@ -710,7 +710,7 @@ def register(request):
       subject=subject,
       message=message,
       html_message=html_message,
-      from_email='info@pottermouth.com',
+      from_email='info@potterbook.co',
       recipient_list=[email]
     )
     #Continue render here after email auth
@@ -1140,7 +1140,7 @@ def handle_payment(request, slug):
         <link href="https://fonts.googleapis.com/css2?family=Karla&display=swap" rel="stylesheet">
     </head>
     <body style="background-color: #172145; border: 4px solid #263771;">
-        <img style="display: block; margin: 20px auto 40px auto; width: 50vw; max-width: 200px;" src="https://live.staticflickr.com/65535/53071725572_437b75e701_o.png" alt="Logo" />
+        <img style="display: block; margin: 20px auto 40px auto; width: 50vw; max-width: 200px;" src="https://live.staticflickr.com/65535/53083037967_c9a9974c95_o.png" alt="Logo" />
         <div style="text-align: center; width: 80%; margin: 30px auto; font-size: 1.4em; font-family: 'Karla', Arial; color: white;">
         
           <p>Hello {name},</p>
@@ -1161,11 +1161,11 @@ def handle_payment(request, slug):
             tz_string=tz_string,
             verify_url=verification_url
           )
-          send_mail(email_subject, email_message, 'info@pottermouth.com', [client_email], html_message=html_message)
+          send_mail(email_subject, email_message, 'info@potterbook.co', [client_email], html_message=html_message)
           send_mail(
             f'New Booking: {client_name}',
             f'Customer Name: {client_name}\nEmail: {client_email}\nTelephone: {app.telephone}\nAddress: {app.address}\nBooked For: {business_readable_date} - {business_tz} Timezone\nService Required: {service.service}\nPayment Ref: {app.charge_id}\nClient Note: {request.POST["note"]}',
-            'info@pottermouth.com',
+            'info@potterbook.co',
             [business.user.email]
           )
           context = {
@@ -1576,7 +1576,7 @@ The {company} team.
         <link href="https://fonts.googleapis.com/css2?family=Karla&display=swap" rel="stylesheet">
     </head>
     <body style="background-color: #172145; border: 4px solid #263771;">
-        <img style="display: block; margin: 20px auto 40px auto; width: 50vw; max-width: 200px;" src="https://live.staticflickr.com/65535/53071725572_437b75e701_o.png" alt="Logo" />
+        <img style="display: block; margin: 20px auto 40px auto; width: 50vw; max-width: 200px;" src="https://live.staticflickr.com/65535/53083037967_c9a9974c95_o.png" alt="Logo" />
         <div style="text-align: center; width: 80%; margin: 30px auto; font-size: 1.4em; font-family: 'Karla', Arial; color: white;">
         <p>Hello {name}</p>
         <p>A request to change your password has been made. Please <a href="{prl}" target="_blank" style="color: lightgreen; text-decoration: underline;">click here</a> to change your password securely.</p>
@@ -1595,7 +1595,7 @@ The {company} team.
       subject=subject,
       message=message,
       recipient_list=[user.email],
-      from_email='info@pottermouth.com',
+      from_email='info@potterbook.co',
       html_message=html_message
     )
     return JsonResponse({'processed': True})
