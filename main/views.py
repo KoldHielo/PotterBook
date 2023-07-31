@@ -1108,7 +1108,7 @@ def handle_payment(request, slug):
             verification_code=verification_hash
           )
           qr_img = generate_qr_code(
-            request.build_absolute_uri(reverse('verify_appointment', args=[verification_code])),
+            'https://potterbook.co' + reverse('verify_appointment', args=[verification_code]),
             verification_code,
             'png'
           )
@@ -1133,7 +1133,7 @@ def handle_payment(request, slug):
             stripe_account=business.stripe_id
           )
           name = client_name.split()[0]
-          verification_url = request.build_absolute_uri(reverse('verify_appointment', args=[verification_code]))
+          verification_url = 'https://potterbook.co' + reverse('verify_appointment', args=[verification_code])
           email_subject = f'Booking Reference: {app.charge_id}'
           email_message = f'Hello {name},\n\nThank you for booking with {business.business_name} for the service {app.service_reference}. Please keep the date safe in your diary:\n\n{readable_date} - {tz_string} Timezone\n\nWe look forward to seeing you!\n\nPlease forward this link to us on attending the booking so we can verify you: {verification_url}'
           html_message = '''<!DOCTYPE html>
