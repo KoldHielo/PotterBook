@@ -770,18 +770,24 @@ def edit_availability(request):
     if over_period == 'weeks':
       date_until += timedelta(weeks=quantityDWM)
     elif over_period == 'months':
-      date_until = assert_tz(
-        datetime(
-          date_until.year + ((date_until.month + quantityDWM)//12),
-          (date_until.month + quantityDWM)%12,
-          date_until.day,
-          date_until.hour,
-          date_until.minute,
-          date_until.second,
-          date_until.microsecond
-        ),
-        tz_string
-      )
+      day = date_until.day
+      while True:
+        try:
+          date_until = assert_tz(
+            datetime(
+              date_until.year + ((date_until.month + quantityDWM)//12),
+              (date_until.month + quantityDWM)%12,
+              day,
+              date_until.hour,
+              date_until.minute,
+              date_until.second,
+              date_until.microsecond
+            ),
+            tz_string
+          )
+          break  
+        except:
+          day -= 1
     else:
       warning = f'"{over_period}" is not a valid response'
       return JsonResponse({'warning': warning})
