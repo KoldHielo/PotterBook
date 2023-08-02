@@ -1152,7 +1152,7 @@ def handle_payment(request, slug):
           <p>Hello {name},</p>
           <p>Thank you for booking with {bn} for the service {sr}.</p>
           <p>Please keep the date safe in your diary: {readable_date} - {tz_string} Timezone</p>
-          <p>We look forward to seeing you! Don\'t forget to let us scan your QR code below to verify your booking!</p>
+          <p>We look forward to seeing you! Don\'t forget to let us scan your QR ticket below to verify your booking! Please screenshot your QR ticket as soon as you receive it and keep it safe, as it will later disappear from this email for security reasons.</p>
           <img src="{qr_url}" alt="QR Verification" style="width: 100%; max-width: 300px; dislay: block; margin: 30px auto;">
           <p style="font-size: 7px;">If you can\'t see the QR image, please forward this link to us: <a href="{verify_url}" target="_blank" style="color: lightgreen; text-decoration: underline;">{verify_url}</a></p>
         </div>
