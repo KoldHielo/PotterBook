@@ -1232,13 +1232,7 @@ def handle_payment(request, slug):
             intent=intent_id,
             stripe_account=business.stripe_id
           )
-      elif intent_to_cancel.status == "succeeded":
-        stripe.Refund.create(
-            payment_intent=intent_id,
-            stripe_account=business.stripe_id,
-            reason='duplicate',
-            refund_application_fee=True
-          )
+      #Refund initiation was here but caused a refund on form resubmission - something to look into.
       context = {
         'warning': 'The requested appointment is not available and you will not be charged. Any pending funds in your bank account will clear within 7 days. Please choose another appointment',
         'business_slug': slug,
