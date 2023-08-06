@@ -14,7 +14,11 @@ def delete_s3_bucket(sender, instance, **kwargs):
 @receiver(pre_delete, sender=get_user_model())
 def delete_user_appointments(sender, instance, **kwargs):
   appointments = Appointment.objects.filter(
-    business=instance,
-    is_booked=False
+    business=instance
   )
-  appointments.delete()
+  booked_appointments = appointments.filter(is_booked=True)
+  unbooked_appointments = appointments.filter(is_booked=False)
+  unbooked_appointments.delete()
+  for i in booked_appointments:
+    i.business = None
+    i.save()
