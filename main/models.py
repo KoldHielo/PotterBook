@@ -38,7 +38,7 @@ class Service(models.Model):
     return f'{business} - {self.service}'
 
 class Appointment(models.Model):
-  business = models.ForeignKey(to=get_user_model(), on_delete=models.SET_NULL, related_name='business')
+  business = models.ForeignKey(to=get_user_model(), on_delete=models.CASCADE, related_name='business')
   slot = models.DateTimeField()
   address = models.TextField(blank=True, null=True)
   telephone = models.CharField(max_length=50, blank=True, null=True)
