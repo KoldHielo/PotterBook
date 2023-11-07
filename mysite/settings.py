@@ -31,6 +31,7 @@ DEBUG = False
 ALLOWED_HOSTS = [
     'potterbook.co',
     '.potterbook.co',
+    '16.170.98.35',
 ]
 
 # FORM SUBMISSION

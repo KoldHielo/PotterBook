@@ -133,7 +133,6 @@ def appointment_available(request, slug):
       return JsonResponse({'available': True})
     else:
       return JsonResponse({'available': False})
-    
 
 #Stripe Connect & Disconnect
 def profile(request):
