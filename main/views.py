@@ -205,7 +205,8 @@ def update_profile(request):
         user_profile.photo = new_photo
         user_profile.save()
         updated['photo'] = user_profile.photo.url
-      except:
+      except Exception as e:
+        print(str(e))
         pass
 
       try:
