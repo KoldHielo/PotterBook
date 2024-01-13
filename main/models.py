@@ -24,7 +24,7 @@ class CustomBusinessUser(models.Model):
   business_accept = models.BooleanField(default=False, blank=True, null=True, verbose_name='Business accepted terms and conditions and privacy policy')
 
   def __str__(self):
-    return self.business_slug
+    return self.business_slug if type(self.business_slug) == str else '~No Business Name Entered~'
 
 class Service(models.Model):
   business = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
