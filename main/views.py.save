@@ -28,10 +28,6 @@ company = 'PotterBook'
 stripe.api_key = os.environ['STRIPE_SK']
 reg_subdoms = {'www', 'potterbook'}
 
-def set_headers(rend):
-  rend['Content-Security-Policy'] = f"frame-ancestors 'self' {os.environ['TRUSTED_URIS']};"
-  return rend
-
 def convert_tz(dtObj, tz_string):
   tz = pytz.timezone(tz_string)
   converted_dt = dtObj.astimezone(tz)
@@ -110,6 +106,10 @@ def generate_qr_code(data, filename, format):
   image_buffer.seek(0)
   image_file = ImageFile(image_buffer, name=f'{filename}.{format.lower()}')
   return image_file
+
+def set_headers(rend):
+  rend['Content-Security-Policy'] = f"frame-ancestors 'self' {os.environ['TRUSTED_DOMAINS']};"
+  return rend
 
 def appointment_available(request, slug):
   if request.method == 'POST':
@@ -522,10 +522,7 @@ def home(request):
         'unbooked_last_month': last_month_appointments & unbooked_appointments
       }, 
     }
-  rend = render(request, 'home/home.html', context)
-  if request.user.is_authenticated == False:
-    rend = set_headers(rend)
-  return rend
+  return render(request, 'home/home.html', context)
 
 def login_page(request):
   subdomain = request.META['HTTP_HOST'].split('.')[0]
