@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset
+      xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+            http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+<!-- created with Free Online Sitemap Generator www.xml-sitemaps.com -->
+
+
+<url>
+  <loc>https://potterbook.co/</loc>
+  <lastmod>2024-01-25T10:11:17+00:00</lastmod>
+  <priority>1.00</priority>
+  <changefreq>weekly</changefreq>
+</url>
+<url>
+  <loc>https://potterbook.co/pricing/</loc>
+  <lastmod>2024-01-25T10:11:17+00:00</lastmod>
+  <priority>0.80</priority>
+  <changefreq>weekly</changefreq>
+</url>
+<url>
+  <loc>https://potterbook.co/contact/</loc>
+  <lastmod>2024-01-25T10:11:17+00:00</lastmod>
+  <priority>0.80</priority>
+  <changefreq>weekly</changefreq>
+</url>
+<url>
+  <loc>https://potterbook.co/register/</loc>
+  <lastmod>2024-01-25T10:11:17+00:00</lastmod>
+  <priority>0.80</priority>
+  <changefreq>weekly</changefreq>
+</url>
+<url>
+  <loc>https://potterbook.co/login/</loc>
+  <lastmod>2024-01-25T10:11:17+00:00</lastmod>
+  <priority>0.80</priority>
+  <changefreq>weekly</changefreq>
+</url>
+<url>
+  <loc>https://potterbook.co/termsandconditions/</loc>
+  <lastmod>2024-01-25T10:11:17+00:00</lastmod>
+  <priority>0.64</priority>
+  <changefreq>weekly</changefreq>
+</url>
+<url>
+  <loc>https://potterbook.co/privacypolicy/</loc>
+  <lastmod>2024-01-25T10:11:17+00:00</lastmod>
+  <priority>0.64</priority>
+  <changefreq>weekly</changefreq>
+</url>
+<url>
+  <loc>https://potterbook.co/forgotpassword/</loc>
+  <lastmod>2024-01-25T10:11:17+00:00</lastmod>
+  <priority>0.64</priority>
+  <changefreq>weekly</changefreq>
+</url>
+
+
+</urlset>
