@@ -997,7 +997,7 @@ def create_payment_intent(request, slug):
     is_booked=False
   )
   if appointment.exists() and business_stripe_user is not None and price == service.price:
-    description = f'{service.service} @ {readable_date}'
+    description = f'{service.service};{readable_date}'
     amount = service.price
     my_percentage = 0.02
     application_fee = int(amount * my_percentage)
@@ -1071,7 +1071,7 @@ def handle_payment(request, slug):
         charge_id=intent_id
       )
       intent = stripe.PaymentIntent.retrieve(intent_id, stripe_account=business.stripe_id)
-      if appointment.exists() and intent_check.exists() is False:
+      if appointment.exists() and intent_check.exists() is False and intent['amount'] == service.price and intent['currency'] == service.currency and intent['description'].split(';')[0] == service.service:
         if intent.status == 'requires_capture':
           verification_code = secrets.token_urlsafe(255)
           verification_hash = hash_value(verification_code)
