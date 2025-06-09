@@ -25,7 +25,7 @@ import pytz
 
 
 company = 'PotterBook'
-stripe.api_key = os.environ['STRIPE_SK']
+stripe.api_key = os.environ['KOWD_STRIPE_SK_TEST']
 reg_subdoms = {'www', 'potterbook'}
 
 def set_headers(rend):
@@ -48,7 +48,7 @@ def hash_value(value):
   data = salt + value + pepper
   hash = sha256(data.encode()).hexdigest()
   return hash
-  
+
 
 def get_stripe_user(user):
   try:
@@ -197,7 +197,7 @@ def update_profile(request):
           updated['pref_tz'] = pref_tz
       except:
         pass
-          
+
 
       try:
         new_photo = request.FILES['new-profile-photo']
@@ -317,7 +317,7 @@ def update_profile(request):
           'old_service_slug': slugify(check_service_name),
           'new_service_slug': slugify(new_service_name),
         }
-        
+
       except Exception as e:
         pass
       return JsonResponse(updated)
@@ -355,7 +355,7 @@ def disconnect(request):
       return JsonResponse({'warning': str(e)})
   else:
     return JsonResponse({'warning': 'You must be logged in to access this page'})
-      
+
 # Create your views here.
 def home(request):
   context = {}
@@ -383,12 +383,12 @@ def home(request):
         possesive_apostrophe = "'s"
       context['warning'] = f'{business.business_name}{possesive_apostrophe} schedule is not available at the moment. Please check back soon!'
       return render(request, 'business_schedule.html', context)
-    else: 
+    else:
       return render(request, 'business_schedule.html', context)
-      
+
   elif subdomain in reg_subdoms and request.user.is_authenticated:
     now = timezone.make_aware(datetime.utcnow())
-    
+
     last_month = now.month - 1
     last_month_year = now.year
     if last_month < 1:
