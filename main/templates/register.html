@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>Register - PotterBook</title>
+<style>
+  
+  form {
+    display: grid;
+    position: relative;
+    width: 400px;
+    border: 3px solid white;
+    border-top: none;
+    margin: 100px auto 5px auto;
+  }
+
+  h1, .border-top {
+    position: absolute;
+  }
+
+  h1 {
+    color: white;
+    justify-self: center;
+    top: -20px;
+  }
+
+  .border-top {
+    width: 140px;
+    height: 2px;
+    background-color: white;
+  }
+
+  #border-top-right {
+    justify-self: right;
+  }
+
+  label, input {
+    text-align: center;
+  }
+
+  label {
+    margin-top: 10px;
+  }
+
+  label:first-of-type {
+    margin-top: 40px;
+  }
+
+  input {
+    margin: 0 auto 0 auto;
+    width: 90%;
+  }
+
+  input:last-of-type {
+    margin-bottom: 10px;
+  }
+
+  button {
+    margin: 15px auto;
+    width: 50px;
+  }
+
+  #password-div {
+    margin: 0 auto;
+    display: grid;
+    justify-content: center;
+  }
+
+  #password-div > span {
+    font-size: 10px;
+    text-align: center;
+  }
+
+  #ar {
+    display: block;
+    margin: 0 auto 215px auto;
+    text-decoration: underline;
+    text-align: right;
+    width: 400px;
+    font-size: 13.5px;
+  }
+
+  #terms {
+    font-size: 13px;
+  }
+
+  #terms a {
+    color: lightgreen;
+    text-decoration: underline;
+  }
+
+  #terms > * {
+    margin: 4px auto;
+  }
+</style>
+{% endblock %}
+
+{% block main %}
+<form action="/register/" method="post">
+  {% csrf_token %}
+  <h1>Register</h1>
+  <div id="border-top-left" class="border-top"></div>
+  <div id="border-top-right" class="border-top"></div>
+  <label for="first-name">First Name</label>
+  <input required type="text" id="first-name" name="first-name" placeholder="John" />
+  <label for="last-name">Last Name</label>
+  <input required type="text" id="last-name" name="last-name" placeholder="Smith" />
+  <label for="business-name">Business Name</label>
+  <input required type="text" id="business-name" name="business-name" placeholder="Smith's Barbers" />
+  <label for="email">Email</label>
+  <input required type="email" id="email" name="email" placeholder="johnsmith@email.com" />
+  <label for="password">Password</label>
+  <div id="password-div">
+    <input required type="password" id="password" name="password" pattern="^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$" />
+    <span>Password must be 8+ characters, contain a capital letter, lowercase letter and a special character.</span>
+  </div>
+  <label for="confirm-password">Confirm Password</label>
+  <input required type="password" id="confirm-password" name="confirm-password" pattern="^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$" />
+  
+  <label id="terms">
+    <span>
+      Please check the box below to confirm that you have read and accepted our <a href="{% url 'terms_and_conditions' %}" target="_blank">Terms and Conditions</a> and <a href="{% url 'privacy_policy' %}" target="_blank">Privacy Policy</a>
+    </span>
+    <input type="checkbox" name="business_accepts" value="accepted" required></label>
+  
+  <button>Submit</button>
+  <input id="timezone" type="hidden" name="timezone">
+</form>
+<a id="ar" href="{% url 'login' %}">Already Registered?</a>
+{% if messages %}
+<div>{{message}}</div>
+{% endif %}
+
+<script>
+  const tzInput = document.querySelector('#timezone');
+  tzInput.value = Intl.DateTimeFormat().resolvedOptions().timeZone;
+</script>
+
+{% endblock %}

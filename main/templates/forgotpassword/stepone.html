@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<style>
+  h1 {
+    margin: 80px auto 0 auto;
+    text-align: center;
+  }
+
+  form {
+    margin: 70px auto 50px auto;
+    width: 400px;
+  }
+
+  form > * {
+    display: block;
+  }
+
+  form > div {
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-evenly;
+    padding: 0 50px;
+  }
+
+  input {
+    width: 220px;
+  }
+
+  button {
+    margin: 10px auto 0 auto;
+  }
+
+  #instructions {
+    margin: 0 auto;
+    text-align: center;
+    width: 400px;
+  }
+</style>
+{% endblock %}
+
+{% block main %}
+<h1>Forgotten Your Password?</h1>
+<form action="{% url 'forgot_password' %}" method="post">
+  {% csrf_token %}
+  <div>
+    <label for="email">Email: </label>
+    <input id="email" type="email" name="email">
+  </div>
+  <button>Submit</button>
+</form>
+<div id="instructions">Please enter the email address associated with your account. If an account exists with your email, you will get instructions on how to reset your password sent through to the same email you've entered.</div>
+
+<script>
+  const passForm = document.querySelector('form');
+  passForm.addEventListener('submit', e => {
+    e.preventDefault();
+    fetch(passForm.action, {
+      method: 'POST',
+      body: new FormData(passForm)
+    })
+    .then(res => res.json())
+    .then(res => {
+      if('warning' in res) {
+        alert(res.warning);
+      }
+      else if('processed' in res) {
+        if(res.processed) {
+          alert('Form successfully submitted. Please look in your email inbox.');
+        }
+      }
+    })
+  })
+</script>
+{% endblock %}

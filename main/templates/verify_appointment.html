@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>Verify Appointment - PotterBook</title>
+<style>
+  h1 {
+    margin: 80px auto;
+    text-align: center;
+    color: lightgreen;
+  }
+
+  #booking-details {
+    margin: 0 auto;
+    width: 90%;
+    max-width: 450px;
+    border: 2px solid white;
+  }
+
+  #booking-details > div {
+    margin: 50px auto;
+    text-align: center;
+    font-size: 25px;
+    display: grid;
+  }
+
+  .field {
+    font-weight: bold;
+  }
+</style>
+{% endblock %}
+
+{% block main %}
+{% if verified %}
+{% if already_verified %}
+<h1 style="color: orange;" class="nowhite">Booking Already Verified!</h1>
+{% else %}
+<h1 class="nowhite">Booking Verified!</h1>
+{% endif %}
+<section id="booking-details">
+  <div>
+    <span class="field">Date: </span>
+    <span class="deets">{{appointment.slot}}</span>
+  </div>
+  <div>
+    <span class="field">Client Name: </span>
+    <span class="deets">{{appointment.name}}</span>
+  </div>
+  <div>
+    <span class="field">Client Email: </span>
+    <span class="deets">{{appointment.email}}</span>
+  </div>
+  <div>
+    <span class="field">Service: </span>
+    <span class="deets">{{appointment.service_reference}}</span>
+  </div>
+</section>
+
+{% endif %}
+<script>
+  {% if verified == False %}
+    alert('No Appointment Found');
+    window.location.replace('{% url "home" %}');
+  {% endif %}
+</script>
+{% endblock %}

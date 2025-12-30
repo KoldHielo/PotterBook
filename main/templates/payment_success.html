@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>Payment Successful - PotterBook</title>
+<style>
+    h1 {
+        text-align: center;
+        margin: 70px auto 50px auto;
+        color: green;
+    }
+    
+    
+    
+    h2, h5 {
+        text-align: center;
+        font-size: 15px;
+        width: 300px;
+        margin: 0 auto 5px auto;
+    }
+    
+    h2 {
+        color: navy;
+        margin-bottom: 50px;
+    }
+    
+    h5 {
+        margin: 15px 0;
+    }
+    
+    #info > div {
+        font-size: 20px;
+        margin: 80px 0;
+    }
+    
+    h5:nth-of-type(odd) {
+        font-size: 20px;
+    }
+    
+    h5:nth-of-type(even) {
+        width: 270px;
+        margin: 0 auto;
+        color: green;
+    }
+    
+    #info {
+        border: 3px solid navy;
+        width: 300px;
+        margin: 0 auto;
+    }
+    
+    #email {
+        color: green;
+    }
+</style>
+{% endblock %}
+
+{% block main %}
+<h1>Payment Successful</h1>
+        <h2>Your booking has been confirmed. Details of your booking have been sent to <span id="email">{{email}}</span>. Please keep the following information safe:</h2>
+        <div id="info">
+            <div>
+                <h5>Appointment:</h5>
+                <h5>{{readable_date}}</h5>
+            </div>
+            <div>
+                <h5>Payment Reference:</h5>
+                <h5>{{pay_ref}}</h5>
+            </div>
+        </div>
+{% endblock %}

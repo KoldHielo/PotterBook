@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>Privacy Policy - PotterBook</title>
+<style>
+  h1 {
+    margin: 80px auto 60px auto;
+    text-align: center;
+  }
+
+  #pp-container {
+    width: 80%;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  p {
+    margin: 7.5px auto;
+  }
+
+  p:first-of-type {
+    margin-top: 30px;
+  }
+
+  h2 {
+    margin-top: 20px;
+  }
+</style>
+{% endblock %}
+
+{% block main %}
+<h1>PotterBook Privacy Policy</h1>
+<section id="pp-container">
+  <p>This Privacy Policy governs the manner in which PotterBook collects, uses, maintains, and discloses information collected from users (referred to as "you" or "users") of the PotterBook website ("Website"). This Privacy Policy applies to the Website and all products and services offered by PotterBook.</p>
+  
+  <h2>1. Information Collection</h2>
+  <p>a) Business Accounts: When businesses register on the Website, we collect the following information: business owner's or administrator's name, email address, business name, and desired password. This information is collected through the registration form and stored securely in our PostgreSQL database hosted on railway.app.</p>
+  <p>b) Client Information: When clients make a booking on a business' payment page, we collect their name, email address, telephone number, address, and note to the business. This information is accessible to PotterBook and the specific business they are booking with.</p>
+  <p>c) Cookies: We use cookies for login/authentication purposes and to ensure the security of user sessions. These cookies do not track user behavior or collect personal information.</p>
+  
+  <h2>2. Purpose of Collection</h2>
+  <p>a) Business Accounts: The information collected from businesses is used to establish and maintain their accounts, communicate with them, and enable them to provide their services on the Website.</p>
+  <p>b) Client Information: The client information collected is used to facilitate the booking process and enable businesses to contact their clients regarding the booked services.</p>
+  
+  <h2>3. Data Storage and Security</h2>
+  <p>a) Database: All user data collected from the Website is securely stored in our PostgreSQL database hosted on railway.app. Account passwords, password reset links, and QR ticket verification codes are hashed for enhanced security.</p>
+  <p>b) Media Storage: Profile photos uploaded by businesses are stored in an AWS S3 bucket, ensuring the privacy and security of the media content.</p>
+  <p>c) Financial Transactions: All financial transactions, including card payments, are securely processed by Stripe. PotterBook does not store or have access to any sensitive card information.</p>
+  
+  <h2>4. Data Usage and Sharing</h2>
+  <p>a) Business Accounts: Business account information is not shared with any third parties. However, some business data, such as business names and bios, may be publicly displayed on the Website for the purpose of facilitating services.</p>
+  <p>b) Client Information: Client information is only shared with the specific business with which the client has made a transaction. PotterBook does not share client information with any other third parties. Please note that PotterBook cannot guarantee the actions of the business in safeguarding client information, and clients are responsible for conducting their own research and due diligence.</p>
+  
+  <h2>5. Data Retention</h2>
+  <p>We retain user data for as long as necessary to fulfill the purposes outlined in this Privacy Policy. However, we are open to requests for data deletion on an ad hoc basis.</p>
+  
+  <h2>6. User Rights</h2>
+  <p>a) Business Accounts: Registered businesses have the right to update their business name, services provided, and schedule through their profile page on the Website. If a business wishes to change the administrator's name, they must contact PotterBook.</p>
+  <p>b) Client Information: Once a client has made a payment, they do not have the right to change or remove any data from our system. Clients are advised to carefully review and provide accurate information during the booking process.</p>
+
+  <h2>7. Cookies and Tracking Technologies</h2>
+  <p>PotterBook uses cookies for login/authentication purposes and to ensure the security of user sessions. These cookies do not track user behavior or collect personal information. Users may manage their cookie preferences through their web browser settings.</p>
+  
+  <h2>8. Children's Privacy</h2>
+  <p>The PotterBook Website is not intended for individuals under the age of 18. Business users must have an administrator who is an adult, and clients must be 18 years of age or older, or act on behalf of a person under 18.</p>
+  
+  <h2>9. Updates to the Privacy Policy</h2>
+  <p>Businesses will be notified via email regarding any updates or changes made to this Privacy Policy. Clients are required to read and accept the Terms and Conditions and Privacy Policy upon each checkout, acknowledging their agreement with the policies.</p>
+</section>
+{% endblock %}
